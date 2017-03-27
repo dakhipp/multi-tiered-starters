@@ -1,6 +1,6 @@
 // See: https://github.com/glennjones/hapi-swagger
 
-const pkg = require('../../../package.json');
+const pkg = require('../../package.json');
 
 module.exports = {
 	register: require('hapi-swagger'),

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "start:dev": "nodemon index.js"
+    "start:dev": "nodemon index.js",
+    "docker": "docker build -t api-server . ; docker run -it -p 80:8000 api-server"
   },
   "author": "",
   "license": "ISC",

@@ -1,5 +1,5 @@
 {
-  "name": "containerized-multi-tiered",
+  "name": "multi-tiered-node-mongo-starter",
   "version": "1.0.0",
   "description": "A containerized multi-tiered application starter consisting of a html server, an api server, a static asset server, a dev only front-end application bundling server, a mongodb server, and a naxsi & nginx application firewall / proxy server.",
   "main": "index.js",

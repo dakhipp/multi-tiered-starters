@@ -27,6 +27,7 @@ Final Todos:
 - ensure all environments are being properly tested and it is easy to run all tests
 
 Additions:
+- use pm2 instead of nodemon
 - integrate all services with Kubernetes
 - create SQL based version of this stack
 - come up with easy way to deploy and test this stack on AWS
