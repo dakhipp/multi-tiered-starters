@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./api-server",
     "start:dev": "nodemon ./api-server",
-    "dc": "docker-compose up -d"
+    "dc": "docker-compose up -d",
+    "dc:buld": "docker-compose up -d --build"
   },
   "author": "",
   "license": "ISC",

@@ -26,6 +26,10 @@ Final Todos:
 - ensure all environments accessible to each other
 - ensure all environments are being properly tested and it is easy to run all tests
 
+Small Todos:
+- create better way of syncing localhost with docker-compose links
+- create persistant db storage with volumes, or create db seed script
+
 Additions:
 - use pm2 instead of nodemon
 - integrate all services with Kubernetes
