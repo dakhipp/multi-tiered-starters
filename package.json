@@ -1,0 +1,27 @@
+{
+  "name": "containerized-multi-tiered",
+  "version": "1.0.0",
+  "description": "A containerized multi-tiered application starter consisting of a html server, an api server, a static asset server, a dev only front-end application bundling server, a mongodb server, and a naxsi & nginx application firewall / proxy server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./api-server",
+    "start:dev": "nodemon ./api-server",
+    "dc": "docker-compose up -d"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "boom": "^4.3.0",
+    "hapi": "^16.1.0",
+    "hapi-swagger": "^7.7.0",
+    "inert": "^4.1.0",
+    "joi": "^10.3.1",
+    "joi-objectid": "^2.0.0",
+    "lodash": "^4.17.4",
+    "mongojs": "^2.4.0",
+    "nodemon": "^1.11.0",
+    "pm2": "^2.4.2",
+    "vision": "^4.1.1"
+  }
+}

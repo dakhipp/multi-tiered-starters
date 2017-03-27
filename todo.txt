@@ -1,0 +1,42 @@
+API Todos:
+- set up docker compose for mongo and app
+- set up linting
+- set up testing
+- make 1 of each type of user route
+- make login / register routes
+- ensure making the db connection on each controller is not leaving many connections open
+
+Static Server Todos:
+- set up a hapi web server using react for server side templates
+- figure out a good solution for testing both environments 
+
+Bundle Server Todos:
+- create webpack workflow that allows for quick development of front-end applications
+- send application bundles to a place that makes them assessable to other services
+- integrate testing in all 3 environments
+
+Naxis & Nginx Proxy Sever Todos:
+- configure server requirements
+- configure nasis rules
+- create nginx conf
+- ensure all services are correctly integrated
+
+Final Todos:
+- ensure all environments are easily started, docker-compose
+- ensure all environments accessible to each other
+- ensure all environments are being properly tested and it is easy to run all tests
+
+Additions:
+- integrate all services with Kubernetes
+- create SQL based version of this stack
+- come up with easy way to deploy and test this stack on AWS
+- create static server environment that can be replaced with s3 in production
+- customize swagger docs page
+
+project goal:
+Create a dockerized environment containing the following:
+- api server
+- static server (react templated, server rendered pages)
+- bundle server (webpack frontend app bundler)
+- naxis nginx router / front facing proxy
+- At 1st mongoDB server, allow for switching or adding SQL easily
