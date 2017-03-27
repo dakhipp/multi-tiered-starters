@@ -1,5 +1,4 @@
 API Todos:
-- set up docker compose for mongo and app
 - set up linting
 - set up testing
 - make 1 of each type of user route
@@ -29,6 +28,7 @@ Final Todos:
 Small Todos:
 - create better way of syncing localhost with docker-compose links
 - create persistant db storage with volumes, or create db seed script
+- enable logging
 
 Additions:
 - use pm2 instead of nodemon
@@ -38,7 +38,7 @@ Additions:
 - create static server environment that can be replaced with s3 in production
 - customize swagger docs page
 
-project goal:
+Project Goal:
 Create a dockerized environment containing the following:
 - api server
 - static server (react templated, server rendered pages)
