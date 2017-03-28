@@ -10,8 +10,8 @@ const dbPass = process.env.DBPASS || '';
 // (create init .sh script to add mongo to host file)
 // (create nginx proxy to connect services)
 //
-// const dbHost = process.env.DBHOST || 'localhost';
-const dbHost = process.env.DBHOST || 'mongo'; // for docker
+const dbHost = process.env.DBHOST || 'localhost';
+// const dbHost = process.env.DBHOST || 'mongo'; // for docker
 const dbName = process.env.DBNAME || 'swaggerAPI';
 
 // const dbConnectStr = `${dbUser}:${dbPass}@${dbHost}/${dbName}`;

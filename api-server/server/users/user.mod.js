@@ -21,7 +21,7 @@ module.exports = {
 		name: joi
 			.string()
 			.required()
-			.description('name of the user')
+			.description('The name of the user.')
 			.example('Luke'),
 	})
 	.label('user'),
