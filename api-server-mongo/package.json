@@ -4,9 +4,12 @@
   "description": "A starter project for a swagger enabled api.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "lab -v -L --lint-warnings-threshold 20 -C -D -c -t 80 ",
+    "cover": "lab -r html -o coverage.html",
     "start": "node index.js",
     "start:dev": "nodemon index.js",
+    "start:test": "NODE_ENV=testing node index.js",
+    "start:prod": "NODE_ENV=production node index.js",
     "docker": "docker build -t api-server . ; docker run -it -p 80:8000 api-server"
   },
   "author": "",
@@ -17,11 +20,17 @@
     "hapi-swagger": "^7.7.0",
     "inert": "^4.1.0",
     "joi": "^10.3.1",
-    "joi-objectid": "^2.0.0",
     "lodash": "^4.17.4",
     "mongojs": "^2.4.0",
     "nodemon": "^1.11.0",
     "pm2": "^2.4.2",
     "vision": "^4.1.1"
+  },
+  "devDependencies": {
+    "code": "^4.0.0",
+    "eslint": "^3.18.0",
+    "eslint-config-hapi": "^10.0.0",
+    "eslint-plugin-hapi": "^4.0.0",
+    "lab": "^13.0.1"
   }
 }

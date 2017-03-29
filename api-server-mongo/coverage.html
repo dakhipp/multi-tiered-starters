@@ -1,0 +1,2680 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Tests &amp; Coverage</title>
+    <script>
+      headings = [];
+    
+      onload = function () {
+          headings = document.querySelectorAll('h2');
+          reset();
+      };
+    
+      onscroll = function (e) {
+          var heading = find(window.scrollY);
+          if (!heading) {
+            var current = document.querySelector('#menu a.active');
+            if (current) {
+              current.className = '';
+            }
+            return;
+          }
+          var links = document.querySelectorAll('#menu a')
+                  , link;
+    
+          for (var i = 0, len = links.length; i < len; ++i) {
+              link = links[i];
+              link.className = link.getAttribute('href') == '#' + heading.id ? 'active' : '';
+          }
+      };
+    
+      function find (y) {
+          var i = headings.length
+                  , heading;
+    
+          while (i--) {
+              heading = headings[i];
+              if (y >= heading.offsetTop) {
+                  return heading;
+              }
+          }
+      }
+    
+      function toggle (className) {
+    
+          var elements = document.getElementsByClassName(className);
+    
+          for (var i = 0, il = elements.length; i < il; ++i) {
+              var element = elements[i];
+    
+              if (element.classList.contains('hide')) {
+                  element.classList.remove('hide');
+                  element.classList.add('show');
+              }
+              else {
+                  element.classList.remove('show');
+                  element.classList.add('hide');
+              }
+          };
+      }
+    
+      function reset () {
+    
+          var shownElements = document.getElementsByClassName('show');
+          var filterElements = document.querySelectorAll('input[type=checkbox]');
+    
+          for (var i = 0, il = filterElements.length; i < il; ++i) {
+              filterElements[i].checked = false;
+          }
+    
+          // Check any filters with visible elements
+          for (i = 0, il = shownElements.length; i < il; ++i) {
+              var shownElement = shownElements[i];
+              var classNames = shownElement.className.split(' ');
+              for (var ci = 0, cl = classNames.length; ci < cl; ++ci){
+                  var element = document.getElementById('show-' + classNames[ci]);
+                  if (element) {
+                      element.checked = true;
+                  }
+              }
+          }
+      };
+    
+      function filter (element) {
+    
+          toggle(element.value);
+          reset();
+      }
+    </script>
+    <style>
+        body {
+            font: 14px/1.6 Helvetica, Arial, sans-serif;
+            margin: 0;
+            color: #2c2c2c;
+        }
+    
+        #tests, #coverage, #linting {
+            padding: 60px;
+        }
+    
+        h1 a:hover {
+            text-decoration: none;
+        }
+    
+        a[href^="#"],
+        a[href^="#"]:visited {
+            color: inherit;
+            text-decoration: none;
+        }
+    
+        h2 {
+            width: 80%;
+            margin-top: 80px;
+            margin-bottom: 0;
+            font-weight: 100;
+            letter-spacing: 1px;
+        }
+    
+        ul {
+            margin-top: 20px;
+            padding: 0 15px;
+            width: 100%;
+        }
+    
+        ul li {
+            float: left;
+            width: 40%;
+            margin-top: 5px;
+            margin-right: 60px;
+            list-style: none;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+    
+        #menu {
+            position: fixed;
+            font-size: 12px;
+            overflow-y: auto;
+            top: 0;
+            right: 0;
+            margin: 0;
+            height: 100%;
+            padding: 15px 15px;
+            border-left: 1px solid #eee;
+            background-color: #666;
+            z-index: 1;
+        }
+    
+        #menu::after {
+            display: block;
+            content: '';
+            padding-top: 80px;
+        }
+    
+        #menu li a {
+            display: block;
+            color: white;
+            padding: 0 5px 0 35px;
+            transition: background 300ms;
+            text-decoration: none;
+        }
+    
+        #menu li {
+            position: relative;
+            list-style: none;
+        }
+    
+        #menu a:hover,
+        #menu a.active {
+            text-decoration: none;
+            background: rgba(255, 255, 255, .4);
+        }
+    
+        #menu li:hover .cov {
+            opacity: 1;
+        }
+    
+        #menu li .dirname {
+            opacity: .60;
+            padding-right: 2px;
+        }
+    
+        #menu li .basename {
+            opacity: 1;
+        }
+    
+        #menu .cov, #menu .lint {
+            background: rgba(0, 0, 0, .3);
+            position: absolute;
+            top: 0;
+            font-size: 9px;
+            text-align: center;
+            opacity: .8;
+            width: 22px;
+            border-radius: 10px;
+            padding: 2px 3px;
+        }
+    
+        #files .stats:nth-child(2n):not(.hide) {
+            display: inline-block;
+            margin-top: 15px;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    
+        .stats div {
+            float: left;
+            padding: 0 5px;
+        }
+    
+        .stats::after {
+            display: block;
+            content: '';
+            clear: both;
+        }
+    
+        .stats .sloc::after {
+            content: ' SLOC';
+            color: #b6b6b6;
+        }
+    
+        .stats .percentage::after {
+            content: ' coverage';
+            color: #b6b6b6;
+        }
+    
+        .stats .hits::before {
+            content: '(';
+            color: #b6b6b6;
+        }
+    
+        .stats .hits::after {
+            content: ' Covered';
+            color: #b6b6b6;
+        }
+    
+        .stats .misses::after {
+            content: ' Not Covered)';
+            color: #b6b6b6;
+        }
+    
+        .stats .failures::after {
+            content: ' Failures';
+            color: #b6b6b6;
+        }
+    
+        .stats .skipped::after {
+            content: ' Skipped';
+            color: #b6b6b6;
+        }
+    
+        .stats .test-count::after {
+            content: ' Tests';
+            color: #b6b6b6;
+        }
+    
+        .stats .duration::before {
+            content: '(';
+            color: #b6b6b6;
+        }
+    
+        .stats .duration::after {
+            content: ' ms)';
+            color: #b6b6b6;
+        }
+    
+        .high {
+            color: #00d4b4;
+        }
+    
+        .medium {
+            color: #e87d0d;
+        }
+    
+        .low {
+            color: #d4081a;
+        }
+    
+        .terrible {
+            color: #d4081a;
+            font-weight: bold;
+        }
+    
+        #files table {
+            width: 80%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            border: 1px solid #cbcbcb;
+            color: #363636;
+            border-radius: 3px;
+        }
+    
+        #files thead {
+            display: none;
+        }
+    
+        table td.line,
+        table td.lint,
+        table td.hits,
+        table td.original-line {
+            width: 20px;
+            background: #eaeaea;
+            text-align: right;
+            font-size: 11px;
+            padding: 0 10px;
+            color: #949494;
+            white-space: nowrap;
+        }
+    
+        table td.hits {
+            width: 10px;
+            padding: 2px 5px;
+            color: rgba(0, 0, 0, .2);
+            background: #f0f0f0;
+        }
+    
+        table td.lint.empty {
+            width: 0;
+            padding: 0;
+        }
+    
+        table td.lint > span {
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            display: inline-block;
+            vertical-align: baseline;
+        }
+    
+        table td.lint .errors {
+            background-color: red;
+        }
+    
+        table td.lint .warnings {
+            background-color: orange;
+        }
+    
+        tr.miss td.line,
+        tr.miss td.hits {
+            background: #e6c3c7;
+        }
+    
+        tr.miss td {
+            background: #f8d5d8;
+        }
+    
+        td.source {
+            padding-left: 15px;
+            line-height: 15px;
+            white-space: pre;
+            font: 12px monaco, monospace;
+        }
+    
+        td.source div {
+            display: inline-block;
+        }
+    
+        td.source div.true {
+            background: #bae8bf;
+        }
+    
+        td.source div.false {
+            background: #e8e5ba;
+        }
+    
+        td.source div.never {
+            background: #f8d5d8;
+        }
+    
+        #tests table {
+            width: 80%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            border: 1px solid #cbcbcb;
+            color: #363636;
+            border-radius: 3px;
+        }
+    
+        #tests thead {
+            background: #F5F5F5;
+        }
+    
+        #tests tr {
+            border: 1px solid #ccc;
+        }
+    
+        #tests td {
+            padding-left: 8px;
+            vertical-align: top;
+        }
+    
+        #tests .success:nth-child(2n) {
+            background: #F5F5F5;
+        }
+    
+        #tests .failure {
+            background: #FF9E9E;
+        }
+    
+        #tests table .skipped {
+            background: #AA82FF;
+        }
+    
+        #tests .success {
+            color: #949494;
+        }
+    
+        #tests .failure .test-title {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    
+        #tests .stack {
+            margin-top: 4px;
+            padding-left: 15px;
+            margin-bottom: 12px;
+            font: 12px monaco, monospace;
+            white-space: pre;
+            line-height: 15px;
+        }
+    
+        .hide {
+            display: none;
+        }
+    
+        .show {
+            display: inherit;
+        }
+    
+        #tests table .show {
+            display: table-row;
+        }
+    
+        [data-tooltip] {
+            position: relative;
+        }
+    
+        [data-tooltip]:hover:before {
+            border: solid;
+            border-color: #333 transparent;
+            border-width: 6px 6px 0 6px;
+            bottom: 20px;
+            content: "";
+            left: 0;
+            position: absolute;
+            z-index: 99;
+        }
+    
+        [data-tooltip]:hover:after {
+            background: #333;
+            background: rgba(0, 0, 0, .8);
+            border-radius: 5px;
+            bottom: 26px;
+            color: #fff;
+            left: -10px;
+            padding: 5px 15px;
+            position: absolute;
+            z-index: 98;
+            content: attr(data-tooltip);
+            white-space: pre;
+            text-align: left;
+        }
+    
+        .line[data-tooltip]:hover:after {
+            content: "Line number";
+        }
+    
+        .hits[data-tooltip]:hover:after {
+            content: "Number of hits";
+        }
+    
+        .miss .source[data-tooltip]:hover:after {
+            content: "Missed line";
+        }
+    
+        .miss.true[data-tooltip]:hover:after {
+            content: "Condition always true";
+        }
+    
+        .miss.false[data-tooltip]:hover:after {
+            content: "Condition always false";
+        }
+    
+        .miss.never[data-tooltip]:hover:after {
+            content: "Statement never reached";
+        }
+    
+        .lint .errors[data-tooltip]:hover:after {
+            content: "Linting errors:\A" attr(data-tooltip);
+        }
+    
+        .lint .warnings[data-tooltip]:hover:after {
+            content: "Linting warnings:\A" attr(data-tooltip);
+        }
+    
+        .original-line[data-tooltip]:hover:after {
+            content: "Original line in file " attr(data-tooltip);
+        }
+    
+        #filters {
+            width: 75%;
+            margin-top: 25px;
+        }
+    
+        #filters label {
+            margin-right: 10px;
+        }
+    
+        .lint-stats .lint-errors::after {
+            content: ' linting errors';
+            color: #b6b6b6;
+        }
+    
+        .lint-stats .lint-warnings::after {
+            content: ' linting warnings';
+            color: #b6b6b6;
+        }
+    
+        .lint-entry {
+            color: #b6b6b6;
+            float: none;
+            padding: 0;
+        }
+    
+        .lint-entry .level-ERROR {
+            color: #d4081a;
+        }
+    
+        .lint-entry .level-WARNING {
+            color: #e87d0d;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="menu">
+        <li><a href="#tests">Test Report</a></li>
+        <li><a href="#coverage">Coverage Report</a></li>
+        <li class="">
+            <span class="cov high">80.77</span>
+            <a href="#index.js"><span class="basename">index.js</span></a>
+        </li>
+        <li class="">
+            <span class="cov medium">60</span>
+            <a href="#server/config.js"><span class="dirname">server/</span><span class="basename">config.js</span></a>
+        </li>
+        <li class="">
+            <span class="cov high">100</span>
+            <a href="#server/routes.js"><span class="dirname">server/</span><span class="basename">routes.js</span></a>
+        </li>
+        <li class="">
+            <span class="cov high">100</span>
+            <a href="#server/modules/plugins.js"><span class="dirname">server/modules/</span><span class="basename">plugins.js</span></a>
+        </li>
+        <li class="">
+            <span class="cov high">100</span>
+            <a href="#server/modules/swagger.js"><span class="dirname">server/modules/</span><span class="basename">swagger.js</span></a>
+        </li>
+        <li class="">
+            <span class="cov medium">68.97</span>
+            <a href="#server/users/user.ctrl.js"><span class="dirname">server/users/</span><span class="basename">user.ctrl.js</span></a>
+        </li>
+        <li class="">
+            <span class="cov high">100</span>
+            <a href="#server/users/user.mod.js"><span class="dirname">server/users/</span><span class="basename">user.mod.js</span></a>
+        </li>
+        <li class="">
+            <span class="cov high">100</span>
+            <a href="#server/users/user.routes.js"><span class="dirname">server/users/</span><span class="basename">user.routes.js</span></a>
+        </li>
+        <li><a href="#linting">Linting Report</a></li>
+    </div>
+    <div id="tests">
+      <h1>Test Report</h1>
+      <div class="stats high">
+          <div class="failures">0</div>
+          <div class="skipped">0</div>
+          <div class="test-count">3</div>
+          <div class="duration">210</div>
+      </div>
+      <div id="filters">
+          <input type="checkbox" checked="" onchange="filter(this)" value="success" id="show-success">
+          <label for="show-success">Show Success</label>
+          <input type="checkbox" checked="" onchange="filter(this)" value="failure" id="show-failure">
+          <label for="show-failure">Show Failure</label>
+          <br>
+          <input type="checkbox" checked="" onchange="filter(this)" value="functional_tests_-_usres" id="show-functional_tests_-_usres">
+          <label for="show-functional_tests_-_usres">functional tests - usres</label>
+          <input type="checkbox" checked="" onchange="filter(this)" value="functional_tests_-_get_documentation" id="show-functional_tests_-_get_documentation">
+          <label for="show-functional_tests_-_get_documentation">functional tests - get documentation</label>
+          <input type="checkbox" checked="" onchange="filter(this)" value="unit_tests_-_user" id="show-unit_tests_-_user">
+          <label for="show-unit_tests_-_user">unit tests - user</label>
+      </div>
+      <table>
+          <thead>
+          <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Duration (ms)</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="show functional_tests_-_usres success">
+              <td class="test-id">1</td>
+              <td class="test-title">functional tests - usres should get users
+                  
+              </td>
+              <td class="test-duration">124</td>
+          </tr>
+          <tr class="show functional_tests_-_get_documentation success">
+              <td class="test-id">2</td>
+              <td class="test-title">functional tests - get documentation should return documentation html
+                  
+              </td>
+              <td class="test-duration">78</td>
+          </tr>
+          <tr class="show unit_tests_-_user success">
+              <td class="test-id">3</td>
+              <td class="test-title">unit tests - user should return all users
+                  
+              </td>
+              <td class="test-duration">3</td>
+          </tr>
+          </tbody>
+      </table>
+    
+    </div>    <div id="coverage">
+        <h1>Code Coverage Report</h1>
+        <div class="stats high">
+            <div class="percentage">86.28%</div>
+            <div class="sloc">226</div>
+            <div class="hits">195</div>
+            <div class="misses">31</div>
+        </div>
+        <div id="filters">
+          <input type="checkbox" checked="" onchange="filter(this)" value="generated" id="show-generated">
+          <label for="show-generated">Show generated files</label>
+        </div>
+        <div id="files">
+            <div class="file ">
+                <h2 id="index.js">index.js </h2>
+                <div class="stats high">
+                    <div class="percentage">80.77%</div>
+                    <div class="sloc">26</div>
+                    <div class="hits">21</div>
+                    <div class="misses">5</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="index.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="index.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__3" class="hit">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Hapi &#x3D; require(&#x27;hapi&#x27;);</td>
+                          
+                        </tr>            <tr id="index.js__4" class="hit">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Config &#x3D; require(&#x27;./server/config&#x27;);</td>
+                          
+                        </tr>            <tr id="index.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Routes &#x3D; require(&#x27;./server/routes&#x27;);</td>
+                          
+                        </tr>            <tr id="index.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Plugins &#x3D; require(&#x27;./server/modules/plugins&#x27;);</td>
+                          
+                        </tr>            <tr id="index.js__8" class="hit">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__9" class="hit">
+                          <td class="line" data-tooltip>9</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const server &#x3D; new Hapi.Server();</td>
+                          
+                        </tr>            <tr id="index.js__10" class="hit">
+                          <td class="line" data-tooltip>10</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__11" class="hit">
+                          <td class="line" data-tooltip>11</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">server.connection({</td>
+                          
+                        </tr>            <tr id="index.js__12" class="hit">
+                          <td class="line" data-tooltip>12</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	host: Config.host,</td>
+                          
+                        </tr>            <tr id="index.js__13" class="hit">
+                          <td class="line" data-tooltip>13</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	port: Config.port</td>
+                          
+                        </tr>            <tr id="index.js__14" class="hit">
+                          <td class="line" data-tooltip>14</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">});</td>
+                          
+                        </tr>            <tr id="index.js__15" class="hit">
+                          <td class="line" data-tooltip>15</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__16" class="hit">
+                          <td class="line" data-tooltip>16</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">server.register(Plugins, (err) &#x3D;&gt; {</td>
+                          
+                        </tr>            <tr id="index.js__17" class="chunks">
+                          <td class="line" data-tooltip>17</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>	if (</div><div class="miss false" data-tooltip>err</div><div>) {</div></td>
+                          
+                        </tr>            <tr id="index.js__18" class="miss">
+                          <td class="line" data-tooltip>18</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>		console.error(err);</td>
+                          
+                        </tr>            <tr id="index.js__19" class="hit">
+                          <td class="line" data-tooltip>19</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	}</td>
+                          
+                        </tr>            <tr id="index.js__20" class="hit">
+                          <td class="line" data-tooltip>20</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__21" class="hit">
+                          <td class="line" data-tooltip>21</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">	server.route(Routes(server));</td>
+                          
+                        </tr>            <tr id="index.js__22" class="hit">
+                          <td class="line" data-tooltip>22</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__23" class="hit">
+                          <td class="line" data-tooltip>23</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">	server.start((err) &#x3D;&gt; {</td>
+                          
+                        </tr>            <tr id="index.js__24" class="chunks">
+                          <td class="line" data-tooltip>24</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>		if (</div><div class="miss false" data-tooltip>err</div><div>) {</div></td>
+                          
+                        </tr>            <tr id="index.js__25" class="miss">
+                          <td class="line" data-tooltip>25</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>			console.error(err);</td>
+                          
+                        </tr>            <tr id="index.js__26" class="hit">
+                          <td class="line" data-tooltip>26</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		}</td>
+                          
+                        </tr>            <tr id="index.js__27" class="hit">
+                          <td class="line" data-tooltip>27</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__28" class="hit">
+                          <td class="line" data-tooltip>28</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// server started</td>
+                          
+                        </tr>            <tr id="index.js__29" class="hit">
+                          <td class="line" data-tooltip>29</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">		console.log(&#x60;Server runing at: ${server.info.uri}&#x60;);</td>
+                          
+                        </tr>            <tr id="index.js__30" class="hit">
+                          <td class="line" data-tooltip>30</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	});</td>
+                          
+                        </tr>            <tr id="index.js__31" class="hit">
+                          <td class="line" data-tooltip>31</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__32" class="hit">
+                          <td class="line" data-tooltip>32</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">	server.on(&#x27;request-error&#x27;, (req, err) &#x3D;&gt; {</td>
+                          
+                        </tr>            <tr id="index.js__33" class="chunks">
+                          <td class="line" data-tooltip>33</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>		</div><div class="miss never" data-tooltip>console.error(err);</div></td>
+                          
+                        </tr>            <tr id="index.js__34" class="hit">
+                          <td class="line" data-tooltip>34</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	});</td>
+                          
+                        </tr>            <tr id="index.js__35" class="hit">
+                          <td class="line" data-tooltip>35</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">});</td>
+                          
+                        </tr>            <tr id="index.js__36" class="hit">
+                          <td class="line" data-tooltip>36</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="index.js__37" class="hit">
+                          <td class="line" data-tooltip>37</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; server;</td>
+                          
+                        </tr>            <tr id="index.js__38" class="hit">
+                          <td class="line" data-tooltip>38</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+            <div class="file ">
+                <h2 id="server/config.js">server/config.js </h2>
+                <div class="stats medium">
+                    <div class="percentage">60%</div>
+                    <div class="sloc">20</div>
+                    <div class="hits">12</div>
+                    <div class="misses">8</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="server/config.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="server/config.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__3" class="chunks">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>const host &#x3D; </div><div class="miss false" data-tooltip>process.env.HOST</div><div> || &#x27;0.0.0.0&#x27;;</div></td>
+                          
+                        </tr>            <tr id="server/config.js__4" class="chunks">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>const	port &#x3D; </div><div class="miss false" data-tooltip>process.env.PORT</div><div> || 8000;</div></td>
+                          
+                        </tr>            <tr id="server/config.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const fullHost &#x3D; &#x60;http://${host}:${port}&#x60;;</td>
+                          
+                        </tr>            <tr id="server/config.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__8" class="chunks">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>const dbUser &#x3D; </div><div class="miss true" data-tooltip>process.env.USER</div><div> || </div><div class="miss never" data-tooltip>&#x27;&#x27;</div><div>;</div></td>
+                          
+                        </tr>            <tr id="server/config.js__9" class="chunks">
+                          <td class="line" data-tooltip>9</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>const dbPass &#x3D; </div><div class="miss false" data-tooltip>process.env.DBPASS</div><div> || &#x27;&#x27;;</div></td>
+                          
+                        </tr>            <tr id="server/config.js__10" class="hit">
+                          <td class="line" data-tooltip>10</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// TODO: come up with a better way to match the host name on</td>
+                          
+                        </tr>            <tr id="server/config.js__11" class="hit">
+                          <td class="line" data-tooltip>11</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// localhost and when using docker-compose</td>
+                          
+                        </tr>            <tr id="server/config.js__12" class="hit">
+                          <td class="line" data-tooltip>12</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">//</td>
+                          
+                        </tr>            <tr id="server/config.js__13" class="hit">
+                          <td class="line" data-tooltip>13</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// Ideas:</td>
+                          
+                        </tr>            <tr id="server/config.js__14" class="hit">
+                          <td class="line" data-tooltip>14</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// (create init .sh script to add mongo to host file)</td>
+                          
+                        </tr>            <tr id="server/config.js__15" class="hit">
+                          <td class="line" data-tooltip>15</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// (create nginx proxy to connect services)</td>
+                          
+                        </tr>            <tr id="server/config.js__16" class="hit">
+                          <td class="line" data-tooltip>16</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">//</td>
+                          
+                        </tr>            <tr id="server/config.js__17" class="chunks">
+                          <td class="line" data-tooltip>17</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>const dbHost &#x3D; </div><div class="miss false" data-tooltip>process.env.DBHOST</div><div> || &#x27;localhost&#x27;;</div></td>
+                          
+                        </tr>            <tr id="server/config.js__18" class="hit">
+                          <td class="line" data-tooltip>18</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// const dbHost &#x3D; process.env.DBHOST || &#x27;mongo&#x27;; // for docker</td>
+                          
+                        </tr>            <tr id="server/config.js__19" class="chunks">
+                          <td class="line" data-tooltip>19</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>let dbName &#x3D; </div><div class="miss false" data-tooltip>process.env.DBNAME</div><div> || &#x27;swaggerAPI&#x27;;</div></td>
+                          
+                        </tr>            <tr id="server/config.js__20" class="hit">
+                          <td class="line" data-tooltip>20</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__21" class="hit">
+                          <td class="line" data-tooltip>21</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// set string up with user and password later</td>
+                          
+                        </tr>            <tr id="server/config.js__22" class="hit">
+                          <td class="line" data-tooltip>22</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// const dbConnectStr &#x3D; &#x60;${dbUser}:${dbPass}@${dbHost}/${dbName}&#x60;;</td>
+                          
+                        </tr>            <tr id="server/config.js__23" class="hit">
+                          <td class="line" data-tooltip>23</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__24" class="chunks">
+                          <td class="line" data-tooltip>24</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>if (</div><div class="miss false" data-tooltip>process.env.NODE_ENV &#x3D;&#x3D;&#x3D; &#x27;testing&#x27;</div><div>) {</div></td>
+                          
+                        </tr>            <tr id="server/config.js__25" class="miss">
+                          <td class="line" data-tooltip>25</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>	dbName &#x3D; &#x27;swaggerAPI-test&#x27;;</td>
+                          
+                        </tr>            <tr id="server/config.js__26" class="hit">
+                          <td class="line" data-tooltip>26</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">}</td>
+                          
+                        </tr>            <tr id="server/config.js__27" class="hit">
+                          <td class="line" data-tooltip>27</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__28" class="hit">
+                          <td class="line" data-tooltip>28</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const dbConnectStr &#x3D; &#x60;${dbHost}/${dbName}&#x60;;</td>
+                          
+                        </tr>            <tr id="server/config.js__29" class="hit">
+                          <td class="line" data-tooltip>29</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__30" class="hit">
+                          <td class="line" data-tooltip>30</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const dbCollections &#x3D; [&#x27;users&#x27;];</td>
+                          
+                        </tr>            <tr id="server/config.js__31" class="hit">
+                          <td class="line" data-tooltip>31</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/config.js__32" class="hit">
+                          <td class="line" data-tooltip>32</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; {</td>
+                          
+                        </tr>            <tr id="server/config.js__33" class="hit">
+                          <td class="line" data-tooltip>33</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	host,</td>
+                          
+                        </tr>            <tr id="server/config.js__34" class="hit">
+                          <td class="line" data-tooltip>34</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	port,</td>
+                          
+                        </tr>            <tr id="server/config.js__35" class="hit">
+                          <td class="line" data-tooltip>35</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	dbConnectStr,</td>
+                          
+                        </tr>            <tr id="server/config.js__36" class="hit">
+                          <td class="line" data-tooltip>36</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	dbCollections,</td>
+                          
+                        </tr>            <tr id="server/config.js__37" class="hit">
+                          <td class="line" data-tooltip>37</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	fullHost</td>
+                          
+                        </tr>            <tr id="server/config.js__38" class="hit">
+                          <td class="line" data-tooltip>38</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/config.js__39" class="hit">
+                          <td class="line" data-tooltip>39</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+            <div class="file ">
+                <h2 id="server/routes.js">server/routes.js </h2>
+                <div class="stats high">
+                    <div class="percentage">100%</div>
+                    <div class="sloc">5</div>
+                    <div class="hits">5</div>
+                    <div class="misses">0</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="server/routes.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="server/routes.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/routes.js__3" class="hit">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const UserRoutes &#x3D; require(&#x27;./users/user.routes.js&#x27;);</td>
+                          
+                        </tr>            <tr id="server/routes.js__4" class="hit">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/routes.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; (server) &#x3D;&gt; {</td>
+                          
+                        </tr>            <tr id="server/routes.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	return [].concat(UserRoutes(server));</td>
+                          
+                        </tr>            <tr id="server/routes.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/routes.js__8" class="hit">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+            <div class="file ">
+                <h2 id="server/modules/plugins.js">server/modules/plugins.js </h2>
+                <div class="stats high">
+                    <div class="percentage">100%</div>
+                    <div class="sloc">5</div>
+                    <div class="hits">5</div>
+                    <div class="misses">0</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="server/modules/plugins.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="server/modules/plugins.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/modules/plugins.js__3" class="hit">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Swagger &#x3D; require(&#x27;./swagger&#x27;);</td>
+                          
+                        </tr>            <tr id="server/modules/plugins.js__4" class="hit">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Inert &#x3D; require(&#x27;inert&#x27;);</td>
+                          
+                        </tr>            <tr id="server/modules/plugins.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Vision &#x3D; require(&#x27;vision&#x27;);</td>
+                          
+                        </tr>            <tr id="server/modules/plugins.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/modules/plugins.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; [Swagger, Inert, Vision];</td>
+                          
+                        </tr>            <tr id="server/modules/plugins.js__8" class="hit">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+            <div class="file ">
+                <h2 id="server/modules/swagger.js">server/modules/swagger.js </h2>
+                <div class="stats high">
+                    <div class="percentage">100%</div>
+                    <div class="sloc">45</div>
+                    <div class="hits">45</div>
+                    <div class="misses">0</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="server/modules/swagger.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__3" class="hit">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// See: https://github.com/glennjones/hapi-swagger</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__4" class="hit">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Pkg &#x3D; require(&#x27;../../package.json&#x27;);</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; {</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__8" class="hit">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	register: require(&#x27;hapi-swagger&#x27;),</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__9" class="hit">
+                          <td class="line" data-tooltip>9</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	options: {</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__10" class="hit">
+                          <td class="line" data-tooltip>10</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		info: {</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__11" class="hit">
+                          <td class="line" data-tooltip>11</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			title: &#x27;Hapi Swagger Starter API&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__12" class="hit">
+                          <td class="line" data-tooltip>12</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			description: &#x60;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__13" class="hit">
+                          <td class="line" data-tooltip>13</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">This API is a starter project for APIs using HapiJS.</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__14" class="hit">
+                          <td class="line" data-tooltip>14</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&lt;br /&gt;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__15" class="hit">
+                          <td class="line" data-tooltip>15</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&lt;br /&gt;To see all routes, [click here](/).</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__16" class="hit">
+                          <td class="line" data-tooltip>16</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&lt;br /&gt;To see V1 routes only, [click here](/?tags&#x3D;v1).</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__17" class="hit">
+                          <td class="line" data-tooltip>17</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&lt;br /&gt;To see V2 routes only, [click here](/?tags&#x3D;v2).</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__18" class="hit">
+                          <td class="line" data-tooltip>18</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&lt;br /&gt;To view the swagger.json, [click here](/swagger.json).</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__19" class="hit">
+                          <td class="line" data-tooltip>19</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				&#x60;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__20" class="hit">
+                          <td class="line" data-tooltip>20</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			// Get the version from package.json</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__21" class="hit">
+                          <td class="line" data-tooltip>21</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			version: Pkg.version,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__22" class="hit">
+                          <td class="line" data-tooltip>22</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			contact: {</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__23" class="hit">
+                          <td class="line" data-tooltip>23</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				name: &#x27;Dakota Hipp&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__24" class="hit">
+                          <td class="line" data-tooltip>24</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">//				url: &#x27;https://dakotahipp.com/&#x27;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__25" class="hit">
+                          <td class="line" data-tooltip>25</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			},</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__26" class="hit">
+                          <td class="line" data-tooltip>26</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			license: {</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__27" class="hit">
+                          <td class="line" data-tooltip>27</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				// Get the license from package.json</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__28" class="hit">
+                          <td class="line" data-tooltip>28</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				name: Pkg.license</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__29" class="hit">
+                          <td class="line" data-tooltip>29</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			}</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__30" class="hit">
+                          <td class="line" data-tooltip>30</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		},</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__31" class="hit">
+                          <td class="line" data-tooltip>31</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// Setup the documentation to be the root of this host</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__32" class="hit">
+                          <td class="line" data-tooltip>32</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		documentationPath: &#x27;/&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__33" class="hit">
+                          <td class="line" data-tooltip>33</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		jsonEditor: true,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__34" class="hit">
+                          <td class="line" data-tooltip>34</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		tags: [{</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__35" class="hit">
+                          <td class="line" data-tooltip>35</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			&#x27;name&#x27;: &#x27;user&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__36" class="hit">
+                          <td class="line" data-tooltip>36</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			&#x27;description&#x27;: &#x27;working with users&#x27;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__37" class="hit">
+                          <td class="line" data-tooltip>37</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		}],</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__38" class="hit">
+                          <td class="line" data-tooltip>38</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// This is for use of grouping together paths.  Since each of our paths begin</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__39" class="hit">
+                          <td class="line" data-tooltip>39</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// with &#x60;/v{1,2}&#x60;, we want to ignore those first to arguments in the path,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__40" class="hit">
+                          <td class="line" data-tooltip>40</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// since they won&#x27;t help us group together resources</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__41" class="hit">
+                          <td class="line" data-tooltip>41</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// pathPrefixSize: 1,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__42" class="hit">
+                          <td class="line" data-tooltip>42</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		basePath: &#x27;/&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__43" class="hit">
+                          <td class="line" data-tooltip>43</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// Also used for grouping paths together</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__44" class="hit">
+                          <td class="line" data-tooltip>44</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		pathReplacements: [{</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__45" class="hit">
+                          <td class="line" data-tooltip>45</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			// Replace the version in all paths</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__46" class="hit">
+                          <td class="line" data-tooltip>46</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			replaceIn: &#x27;groups&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__47" class="hit">
+                          <td class="line" data-tooltip>47</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			pattern: /v([0-9]+)\//,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__48" class="hit">
+                          <td class="line" data-tooltip>48</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			replacement: &#x27;&#x27;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__49" class="hit">
+                          <td class="line" data-tooltip>49</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		},{</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__50" class="hit">
+                          <td class="line" data-tooltip>50</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			// This allows grouping to include plural forms of the noun to be grouped</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__51" class="hit">
+                          <td class="line" data-tooltip>51</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			// with their singular counter-part (ie &#x60;characters&#x60; in the group &#x60;character&#x60;)</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__52" class="hit">
+                          <td class="line" data-tooltip>52</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			replaceIn: &#x27;groups&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__53" class="hit">
+                          <td class="line" data-tooltip>53</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			pattern: /s$/,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__54" class="hit">
+                          <td class="line" data-tooltip>54</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			replacement: &#x27;&#x27;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__55" class="hit">
+                          <td class="line" data-tooltip>55</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		},{</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__56" class="hit">
+                          <td class="line" data-tooltip>56</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			// Group all star wars related routes together</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__57" class="hit">
+                          <td class="line" data-tooltip>57</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			replaceIn: &#x27;groups&#x27;,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__58" class="hit">
+                          <td class="line" data-tooltip>58</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			pattern: /\/(character|planet)/,</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__59" class="hit">
+                          <td class="line" data-tooltip>59</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			replacement: &#x27;/starwars&#x27;</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__60" class="hit">
+                          <td class="line" data-tooltip>60</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		}]</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__61" class="hit">
+                          <td class="line" data-tooltip>61</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	}</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__62" class="hit">
+                          <td class="line" data-tooltip>62</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/modules/swagger.js__63" class="hit">
+                          <td class="line" data-tooltip>63</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+            <div class="file ">
+                <h2 id="server/users/user.ctrl.js">server/users/user.ctrl.js </h2>
+                <div class="stats medium">
+                    <div class="percentage">68.97%</div>
+                    <div class="sloc">58</div>
+                    <div class="hits">40</div>
+                    <div class="misses">18</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="server/users/user.ctrl.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__3" class="hit">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Mongojs &#x3D; require(&#x27;mongojs&#x27;);</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__4" class="hit">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Config &#x3D; require(&#x27;../config&#x27;);</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const db &#x3D; Mongojs(Config.dbConnectStr, Config.dbCollections);</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__8" class="hit">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__9" class="hit">
+                          <td class="line" data-tooltip>9</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// handlers that do work on the routes</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__10" class="hit">
+                          <td class="line" data-tooltip>10</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const handlers &#x3D; {};</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__11" class="hit">
+                          <td class="line" data-tooltip>11</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__12" class="hit">
+                          <td class="line" data-tooltip>12</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">// business specific logic for testing</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__13" class="hit">
+                          <td class="line" data-tooltip>13</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const lib &#x3D; {};</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__14" class="hit">
+                          <td class="line" data-tooltip>14</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__15" class="hit">
+                          <td class="line" data-tooltip>15</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">lib.getUsers &#x3D; function (queryObj) {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__16" class="hit">
+                          <td class="line" data-tooltip>16</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	return new Promise((resolve, reject) &#x3D;&gt; {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__17" class="hit">
+                          <td class="line" data-tooltip>17</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		let page &#x3D; 0;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__18" class="hit">
+                          <td class="line" data-tooltip>18</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>2</td>
+                          <td class="source">		let limit &#x3D; 10;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__19" class="hit">
+                          <td class="line" data-tooltip>19</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>2</td>
+                          <td class="source">		let sort &#x3D; &#x27;name&#x27;;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__20" class="hit">
+                          <td class="line" data-tooltip>20</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__21" class="chunks">
+                          <td class="line" data-tooltip>21</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>		if (</div><div class="miss false" data-tooltip>!queryObj &#x3D;&#x3D;&#x3D; undefined</div><div>) {</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__22" class="miss">
+                          <td class="line" data-tooltip>22</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>			page &#x3D; queryObj.page || 0;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__23" class="miss">
+                          <td class="line" data-tooltip>23</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>			limit &#x3D; queryObj.limit || 10;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__24" class="miss">
+                          <td class="line" data-tooltip>24</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>			sort &#x3D; queryObj.sort || &#x27;name&#x27;;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__25" class="hit">
+                          <td class="line" data-tooltip>25</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		}</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__26" class="hit">
+                          <td class="line" data-tooltip>26</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__27" class="hit">
+                          <td class="line" data-tooltip>27</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>2</td>
+                          <td class="source">		const sortObj &#x3D; {};</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__28" class="hit">
+                          <td class="line" data-tooltip>28</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>2</td>
+                          <td class="source">		sortObj[sort] &#x3D; 1;</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__29" class="hit">
+                          <td class="line" data-tooltip>29</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__30" class="hit">
+                          <td class="line" data-tooltip>30</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>2</td>
+                          <td class="source">		db.users</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__31" class="hit">
+                          <td class="line" data-tooltip>31</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		.find()</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__32" class="hit">
+                          <td class="line" data-tooltip>32</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		.sort(sortObj)</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__33" class="hit">
+                          <td class="line" data-tooltip>33</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		.limit(limit)</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__34" class="hit">
+                          <td class="line" data-tooltip>34</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		.skip(page * limit)</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__35" class="hit">
+                          <td class="line" data-tooltip>35</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		.toArray((err, docs) &#x3D;&gt; {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__36" class="chunks">
+                          <td class="line" data-tooltip>36</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>			if (</div><div class="miss false" data-tooltip>err</div><div>) {</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__37" class="miss">
+                          <td class="line" data-tooltip>37</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>				reject(Boom.wrap(err, &#x27;Internal MongoDB error&#x27;));</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__38" class="hit">
+                          <td class="line" data-tooltip>38</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			}</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__39" class="hit">
+                          <td class="line" data-tooltip>39</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__40" class="hit">
+                          <td class="line" data-tooltip>40</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>2</td>
+                          <td class="source">			resolve(docs);</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__41" class="hit">
+                          <td class="line" data-tooltip>41</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		});</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__42" class="hit">
+                          <td class="line" data-tooltip>42</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	});</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__43" class="hit">
+                          <td class="line" data-tooltip>43</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__44" class="hit">
+                          <td class="line" data-tooltip>44</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__45" class="hit">
+                          <td class="line" data-tooltip>45</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">lib.getUser &#x3D; function (id) {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__46" class="chunks">
+                          <td class="line" data-tooltip>46</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>	</div><div class="miss never" data-tooltip>return new Promise((resolve, reject) &#x3D;&gt; {</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__47" class="chunks">
+                          <td class="line" data-tooltip>47</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>		</div><div class="miss never" data-tooltip>db.users.find({</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__48" class="hit">
+                          <td class="line" data-tooltip>48</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			_id: id</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__49" class="hit">
+                          <td class="line" data-tooltip>49</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		})</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__50" class="hit">
+                          <td class="line" data-tooltip>50</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		.limit(1)</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__51" class="hit">
+                          <td class="line" data-tooltip>51</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		.toArray((err, docs) &#x3D;&gt; {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__52" class="chunks">
+                          <td class="line" data-tooltip>52</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>			</div><div class="miss never" data-tooltip>if (err) {</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__53" class="miss">
+                          <td class="line" data-tooltip>53</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>				reject(Boom.wrap(err, &#x27;Internal MongoDB error&#x27;));</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__54" class="chunks">
+                          <td class="line" data-tooltip>54</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div class="miss never" data-tooltip>			}</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__55" class="hit">
+                          <td class="line" data-tooltip>55</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__56" class="miss">
+                          <td class="line" data-tooltip>56</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>			resolve(docs);</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__57" class="chunks">
+                          <td class="line" data-tooltip>57</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div class="miss never" data-tooltip>		});</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__58" class="chunks">
+                          <td class="line" data-tooltip>58</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div class="miss never" data-tooltip>	});</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__59" class="hit">
+                          <td class="line" data-tooltip>59</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__60" class="hit">
+                          <td class="line" data-tooltip>60</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__61" class="hit">
+                          <td class="line" data-tooltip>61</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">handlers.get &#x3D; function (request, reply) {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__62" class="chunks">
+                          <td class="line" data-tooltip>62</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>	request.query &#x3D; </div><div class="miss true" data-tooltip>request.query</div><div> || </div><div class="miss never" data-tooltip>{}</div><div>;</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__63" class="chunks">
+                          <td class="line" data-tooltip>63</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>	if (</div><div class="miss false" data-tooltip>request.query.id</div><div>) {</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__64" class="miss">
+                          <td class="line" data-tooltip>64</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source" data-tooltip>		reply(lib.getUser(request.query.id));</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__65" class="hit">
+                          <td class="line" data-tooltip>65</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	}</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__66" class="hit">
+                          <td class="line" data-tooltip>66</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	else {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__67" class="hit">
+                          <td class="line" data-tooltip>67</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">		reply(lib.getUsers(request.query));</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__68" class="hit">
+                          <td class="line" data-tooltip>68</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	}</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__69" class="hit">
+                          <td class="line" data-tooltip>69</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__70" class="hit">
+                          <td class="line" data-tooltip>70</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__71" class="hit">
+                          <td class="line" data-tooltip>71</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; {</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__72" class="hit">
+                          <td class="line" data-tooltip>72</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	handlers,</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__73" class="hit">
+                          <td class="line" data-tooltip>73</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	// export lib object for testing business logic</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__74" class="chunks">
+                          <td class="line" data-tooltip>74</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"><div>	lib: (</div><div class="miss true" data-tooltip>process.env.NODE_ENV &#x3D;&#x3D;&#x3D; &#x27;test&#x27;</div><div>) ? lib : </div><div class="miss never" data-tooltip>null</div></td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__75" class="hit">
+                          <td class="line" data-tooltip>75</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/users/user.ctrl.js__76" class="hit">
+                          <td class="line" data-tooltip>76</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+            <div class="file ">
+                <h2 id="server/users/user.mod.js">server/users/user.mod.js </h2>
+                <div class="stats high">
+                    <div class="percentage">100%</div>
+                    <div class="sloc">29</div>
+                    <div class="hits">29</div>
+                    <div class="misses">0</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="server/users/user.mod.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__3" class="hit">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Joi &#x3D; require(&#x27;joi&#x27;);</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__4" class="hit">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; {</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	user: Joi.object().keys({</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// _id validation</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__8" class="hit">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// be wary of this _id validation, not sure if it is too constraining</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__9" class="hit">
+                          <td class="line" data-tooltip>9</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		_id: Joi.object().keys({</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__10" class="hit">
+                          <td class="line" data-tooltip>10</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			_bsontype: Joi</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__11" class="hit">
+                          <td class="line" data-tooltip>11</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				.string()</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__12" class="hit">
+                          <td class="line" data-tooltip>12</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				.valid(&#x27;ObjectID&#x27;)</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__13" class="hit">
+                          <td class="line" data-tooltip>13</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				.required(),</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__14" class="hit">
+                          <td class="line" data-tooltip>14</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			id: Joi</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__15" class="hit">
+                          <td class="line" data-tooltip>15</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				.binary()</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__16" class="hit">
+                          <td class="line" data-tooltip>16</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				.min(12)</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__17" class="hit">
+                          <td class="line" data-tooltip>17</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				.max(12)</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__18" class="hit">
+                          <td class="line" data-tooltip>18</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				.required(),</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__19" class="hit">
+                          <td class="line" data-tooltip>19</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		}),</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__20" class="hit">
+                          <td class="line" data-tooltip>20</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		// end of _id validation</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__21" class="hit">
+                          <td class="line" data-tooltip>21</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		name: Joi</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__22" class="hit">
+                          <td class="line" data-tooltip>22</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			.string()</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__23" class="hit">
+                          <td class="line" data-tooltip>23</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			.required()</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__24" class="hit">
+                          <td class="line" data-tooltip>24</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			.description(&#x27;The name of the user.&#x27;)</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__25" class="hit">
+                          <td class="line" data-tooltip>25</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			.example(&#x27;Luke&#x27;),</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__26" class="hit">
+                          <td class="line" data-tooltip>26</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	})</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__27" class="hit">
+                          <td class="line" data-tooltip>27</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	.label(&#x27;user&#x27;),</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__28" class="hit">
+                          <td class="line" data-tooltip>28</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	// Using a getter here so that I can refer to &#x60;this&#x60;, in reference to the character node of the schema object</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__29" class="hit">
+                          <td class="line" data-tooltip>29</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	get users() {</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__30" class="hit">
+                          <td class="line" data-tooltip>30</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		return Joi</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__31" class="hit">
+                          <td class="line" data-tooltip>31</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			.array()</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__32" class="hit">
+                          <td class="line" data-tooltip>32</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			.items(this.user)</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__33" class="hit">
+                          <td class="line" data-tooltip>33</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			.label(&#x27;list_of_users&#x27;);</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__34" class="hit">
+                          <td class="line" data-tooltip>34</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	}</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__35" class="hit">
+                          <td class="line" data-tooltip>35</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">};</td>
+                          
+                        </tr>            <tr id="server/users/user.mod.js__36" class="hit">
+                          <td class="line" data-tooltip>36</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+            <div class="file ">
+                <h2 id="server/users/user.routes.js">server/users/user.routes.js </h2>
+                <div class="stats high">
+                    <div class="percentage">100%</div>
+                    <div class="sloc">38</div>
+                    <div class="hits">38</div>
+                    <div class="misses">0</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Lint</th>
+                            <th>Hits</th>
+                            <th>Source</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="server/users/user.routes.js__1" class="hit">
+                          <td class="line" data-tooltip>1</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">&#x27;use strict&#x27;;</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__2" class="hit">
+                          <td class="line" data-tooltip>2</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__3" class="hit">
+                          <td class="line" data-tooltip>3</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Joi &#x3D; require(&#x27;joi&#x27;);</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__4" class="hit">
+                          <td class="line" data-tooltip>4</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const UserCtrl &#x3D; require(&#x27;./user.ctrl&#x27;);</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__5" class="hit">
+                          <td class="line" data-tooltip>5</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const Schema &#x3D; require(&#x27;./user.mod&#x27;);</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__6" class="hit">
+                          <td class="line" data-tooltip>6</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__7" class="hit">
+                          <td class="line" data-tooltip>7</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">const routes &#x3D; (server) &#x3D;&gt; [{</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__8" class="hit">
+                          <td class="line" data-tooltip>8</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	method: &#x27;GET&#x27;,</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__9" class="hit">
+                          <td class="line" data-tooltip>9</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	path: &#x27;/v1/users&#x27;,</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__10" class="hit">
+                          <td class="line" data-tooltip>10</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	config: {</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__11" class="hit">
+                          <td class="line" data-tooltip>11</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		handler: UserCtrl.handlers.get,</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__12" class="hit">
+                          <td class="line" data-tooltip>12</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		description: &#x27;Returns an array of users.&#x27;,</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__13" class="hit">
+                          <td class="line" data-tooltip>13</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		tags: [&#x27;api&#x27;, &#x27;v1&#x27;, &#x27;users&#x27;],</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__14" class="hit">
+                          <td class="line" data-tooltip>14</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		validate: {</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__15" class="hit">
+                          <td class="line" data-tooltip>15</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			query: {</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__16" class="hit">
+                          <td class="line" data-tooltip>16</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				page: Joi</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__17" class="hit">
+                          <td class="line" data-tooltip>17</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.number()</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__18" class="hit">
+                          <td class="line" data-tooltip>18</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.integer()</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__19" class="hit">
+                          <td class="line" data-tooltip>19</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.min(0)</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__20" class="hit">
+                          <td class="line" data-tooltip>20</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.default(0)</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__21" class="hit">
+                          <td class="line" data-tooltip>21</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.description(&#x27;The current page number of results.&#x27;),</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__22" class="hit">
+                          <td class="line" data-tooltip>22</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				limit: Joi</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__23" class="hit">
+                          <td class="line" data-tooltip>23</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.number()</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__24" class="hit">
+                          <td class="line" data-tooltip>24</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.integer()</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__25" class="hit">
+                          <td class="line" data-tooltip>25</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.min(0)</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__26" class="hit">
+                          <td class="line" data-tooltip>26</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.max(20)</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__27" class="hit">
+                          <td class="line" data-tooltip>27</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.default(10)</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__28" class="hit">
+                          <td class="line" data-tooltip>28</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.description(&#x27;Number of results to show per page.&#x27;),</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__29" class="hit">
+                          <td class="line" data-tooltip>29</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">				sort: Joi</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__30" class="hit">
+                          <td class="line" data-tooltip>30</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.string()</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__31" class="hit">
+                          <td class="line" data-tooltip>31</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.default(&#x27;name&#x27;)</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__32" class="hit">
+                          <td class="line" data-tooltip>32</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">					.description(&#x27;The key on which to sort the results.&#x27;)</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__33" class="hit">
+                          <td class="line" data-tooltip>33</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			}</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__34" class="hit">
+                          <td class="line" data-tooltip>34</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		},</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__35" class="hit">
+                          <td class="line" data-tooltip>35</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		response: {</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__36" class="hit">
+                          <td class="line" data-tooltip>36</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">			schema: Schema.users</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__37" class="hit">
+                          <td class="line" data-tooltip>37</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">		}</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__38" class="hit">
+                          <td class="line" data-tooltip>38</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">	}</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__39" class="hit">
+                          <td class="line" data-tooltip>39</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source">}];</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__40" class="hit">
+                          <td class="line" data-tooltip>40</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__41" class="hit">
+                          <td class="line" data-tooltip>41</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip>1</td>
+                          <td class="source">module.exports &#x3D; routes;</td>
+                          
+                        </tr>            <tr id="server/users/user.routes.js__42" class="hit">
+                          <td class="line" data-tooltip>42</td>
+                          <td class="lint empty"></td>
+                          <td class="hits" data-tooltip></td>
+                          <td class="source"></td>
+                          
+                        </tr>        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>    <div id="linting">
+        <h1>Linting Report</h1>
+            <span>Nothing to show here, linting is disabled.</span>
+    </div>  </body>
+</html>
