@@ -3,9 +3,9 @@ version: "2"
 services:
   # api server
   api:
-    build: ./api-server
+    build: ./api-server-mongo
     volumes:
-      - ./api-server/:/app
+      - ./api-server-mongo/:/app
     ports:
       ["80:8000"]
     links:

@@ -13,6 +13,8 @@ server.connection({
 	port: Config.port
 });
 
+console.log(process.env.DOCKER);
+
 server.register(Plugins, (err) => {
 	if (err) {
 		console.error(err);

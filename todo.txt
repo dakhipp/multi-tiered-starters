@@ -1,5 +1,4 @@
 API Todos:
-- finish linting and testing
 - make 1 of each type of user route
 - make login / register routes
 - ensure making the db connection on each controller is not leaving many connections open

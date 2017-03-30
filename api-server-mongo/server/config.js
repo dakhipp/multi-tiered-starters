@@ -7,15 +7,14 @@ const fullHost = `http://${host}:${port}`;
 
 const dbUser = process.env.USER || '';
 const dbPass = process.env.DBPASS || '';
-// TODO: come up with a better way to match the host name on
-// localhost and when using docker-compose
-//
-// Ideas:
-// (create init .sh script to add mongo to host file)
-// (create nginx proxy to connect services)
-//
-const dbHost = process.env.DBHOST || 'localhost';
-// const dbHost = process.env.DBHOST || 'mongo'; // for docker
+
+// set default db link name as localhost
+let dbHost = process.env.DBHOST || 'localhost';
+// if ENV var DOCKER === true use docker db link name instead
+if (process.env.DOCKER === 'true') {
+	dbHost = process.env.DBHOST || 'mongo';
+}
+
 let dbName = process.env.DBNAME || 'swaggerAPI';
 
 // set string up with user and password later

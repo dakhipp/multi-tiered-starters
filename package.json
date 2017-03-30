@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./api-server",
-    "start:dev": "nodemon ./api-server",
+    "start": "node ./api-server-mongo",
+    "start:dev": "nodemon ./api-server-mongo",
     "dc": "docker-compose up -d",
-    "dc:buld": "docker-compose up -d --build"
+    "dc:build": "docker-compose up -d --build"
   },
   "author": "",
   "license": "ISC",

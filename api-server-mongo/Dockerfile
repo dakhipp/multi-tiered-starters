@@ -11,4 +11,6 @@ COPY . /app
 
 EXPOSE 8000
 
+ENV DOCKER true
+
 CMD ["npm", "run", "start"]
