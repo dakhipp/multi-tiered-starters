@@ -5,8 +5,8 @@ const	port = process.env.PORT || 8000;
 
 const fullHost = `http://${host}:${port}`;
 
-const dbUser = process.env.USER || '';
-const dbPass = process.env.DBPASS || '';
+const dbUser = process.env.USER || 'root';
+const dbPass = process.env.DBPASS || 'toor';
 
 // set default db link name as localhost
 let dbHost = process.env.DBHOST || 'localhost';
@@ -17,21 +17,19 @@ if (process.env.DOCKER === 'true') {
 
 let dbName = process.env.DBNAME || 'swaggerAPI';
 
-// set string up with user and password later
-// const dbConnectStr = `${dbUser}:${dbPass}@${dbHost}/${dbName}`;
-
-if (process.env.NODE_ENV === 'testing') {
-	dbName = 'swaggerAPI-test';
+if (process.env.NODE_ENV === 'test') {
+	dbName = 'swaggerAPITest';
 }
 
-const dbConnectStr = `${dbHost}/${dbName}`;
+// set string up with user and password later
+const dbConnectStr = `${dbUser}:${dbPass}@${dbHost}/${dbName}?authSource=admin`;
 
 const dbCollections = ['users'];
 
 module.exports = {
 	host,
 	port,
+	fullHost,
 	dbConnectStr,
 	dbCollections,
-	fullHost
 };

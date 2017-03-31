@@ -11,7 +11,6 @@ const DBUtils = require('../db-utils');
 const describe = lab.describe;
 const it = lab.it;
 const before = lab.before;
-const after = lab.after;
 
 // require hapi server
 const Server = require('../../');
@@ -21,15 +20,19 @@ const Server = require('../../');
 
 // seed 15
 // get all should have 10
-// get all page 2 should have 5 
+// get all page 2 should have 5
+
+before((done) => {
+	const USERS_TO_SEED = 15;
+	DBUtils.seedNUsers(USERS_TO_SEED)
+	.then((res) => {
+		console.log(`DB seeded with ${USERS_TO_SEED} users.`);
+		done();
+	});
+});
 
 // tests
 describe('Integration Tests - Users', () => {
-	// must return a promise
-	before(() => {
-		return DBUtils.seedFifUsers();
-	});
-
 	it('/GET should get 10 users', (done) => {
     // make API call to self to test functionality end-to-end
 		Server.inject({
@@ -90,10 +93,6 @@ describe('Integration Tests - Users', () => {
 				done();
 			});
 		});
-	});
-	// must return a promise
-	after(() => {
-		return DBUtils.emptyUsers();
 	});
 });
 

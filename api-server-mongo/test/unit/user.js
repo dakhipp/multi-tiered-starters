@@ -5,23 +5,17 @@ const Code = require('code');
 const expect = Code.expect;
 const Lab = require('lab');
 const lab = exports.lab = Lab.script();
-const DBUtils = require('../db-utils');
 
 // use some BDD verbage instead of lab default
 const describe = lab.describe;
 const it = lab.it;
-const before = lab.before;
-const after = lab.after;
+// const before = lab.before;
+// const after = lab.after;
 
 // we require the handlers directly, so we can test the "Lib" functions in isolation
 const UserCtrl = require('../../server/users/user.ctrl');
 
 describe('Unit Tests - User', () => {
-	// must return a promise
-	before(() => {
-		return DBUtils.seedFifUsers();
-	});
-
 	it('Should return all array of all users.', (done) => {
     // test lib function
 		UserCtrl.lib.getUsers().then((users) => {
@@ -30,10 +24,5 @@ describe('Unit Tests - User', () => {
 		}, (err) => {
 			done(err);
 		});
-	});
-
-	// must return a promise
-	after(() => {
-		return DBUtils.emptyUsers();
 	});
 });
