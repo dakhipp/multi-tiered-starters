@@ -18,7 +18,7 @@ lib.getUsers = function (query) {
 		let page = 0;
 		let sort = 'name';
 
-		if (typeof query !== undefined) {
+		if (typeof query !== 'undefined') {
 			page = query.page;
 			sort = query.sort;
 		}

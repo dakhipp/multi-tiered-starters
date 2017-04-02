@@ -1,6 +1,4 @@
 API Todos:
-- set up logging
-- set up pm2
 - make login / register routes, with goups
 - ensure making the db connection on each controller is not leaving many connections open
 
