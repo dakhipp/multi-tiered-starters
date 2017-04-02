@@ -14,7 +14,6 @@ This API is a starter project for APIs using HapiJS.
 <br />
 <br />To see all routes, [click here](/).
 <br />To see V1 routes only, [click here](/?tags=v1).
-<br />To see V2 routes only, [click here](/?tags=v2).
 <br />To view the swagger.json, [click here](/swagger.json).
 				`,
 			// Get the version from package.json
@@ -32,8 +31,8 @@ This API is a starter project for APIs using HapiJS.
 		documentationPath: '/',
 		jsonEditor: true,
 		tags: [{
-			'name': 'user',
-			'description': 'working with users'
+			'name': 'users',
+			'description': 'Working with users.'
 		}],
 		// This is for use of grouping together paths.  Since each of our paths begin
 		// with `/v{1,2}`, we want to ignore those first to arguments in the path,
@@ -46,17 +45,17 @@ This API is a starter project for APIs using HapiJS.
 			replaceIn: 'groups',
 			pattern: /v([0-9]+)\//,
 			replacement: ''
-		},{
-			// This allows grouping to include plural forms of the noun to be grouped
-			// with their singular counter-part (ie `characters` in the group `character`)
-			replaceIn: 'groups',
-			pattern: /s$/,
-			replacement: ''
-		},{
-			// Group all star wars related routes together
-			replaceIn: 'groups',
-			pattern: /\/(character|planet)/,
-			replacement: '/starwars'
+		// }, {
+		// 	// This allows grouping to include plural forms of the noun to be grouped
+		// 	// with their singular counter-part (ie `characters` in the group `character`)
+		// 	replaceIn: 'groups',
+		// 	pattern: /s$/,
+		// 	replacement: ''
+		// },{
+		// 	// Group all star wars related routes together
+		// 	replaceIn: 'groups',
+		// 	pattern: /\/(character|planet)/,
+		// 	replacement: '/starwars'
 		}]
 	}
 };

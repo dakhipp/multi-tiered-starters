@@ -45,6 +45,9 @@ const routes = (server) => [{
 					.description('The ID of the user.'),
 			}
 		},
+		response: {
+			schema: Schema.user
+		}
 	}
 },
 {
