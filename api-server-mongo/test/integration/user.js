@@ -1,6 +1,5 @@
 'use strict';
 
-// requires for testing
 const Code = require('code');
 const expect = Code.expect;
 const Lab = require('lab');
@@ -12,99 +11,83 @@ const describe = lab.describe;
 const it = lab.it;
 const before = lab.before;
 
+const Config = require('../../server/config');
+
 // require hapi server
 const Server = require('../../');
 
-// TODO: refactor config.USERS_PER_CALL global
 // TODO: create get route testing sort query param
 
-// seed 15
-// get all should have 10
-// get all page 2 should have 5
-
+// seed the db
 before((done) => {
 	const USERS_TO_SEED = 15;
 	DBUtils.seedNUsers(USERS_TO_SEED)
 	.then((res) => {
+		// eslint-disable-next-line
 		console.log(`DB seeded with ${USERS_TO_SEED} users.`);
 		done();
 	});
 });
 
-// tests
-describe('Integration Tests - Users', () => {
-	it('/GET should get 10 users', (done) => {
-    // make API call to self to test functionality end-to-end
-		Server.inject({
-			method: 'GET',
-			url: '/v1/users'
-		}, (response) => {
-			expect(response.statusCode).to.equal(200);
-			expect(response.result).to.have.length(10);
-			done();
-		});
-	});
-	it('/GET:id should a user by ID.', (done) => {
-		Server.inject({
-			method: 'GET',
-			url: '/v1/users/123'
-		}, (response) => {
-			expect(response.statusCode).to.equal(200);
-			expect(response.result).to.have.length(1);
-			done();
-		});
-	});
-	it('/POST should create a new user.', (done) => {
-		Server.inject({
-			method: 'POST',
-			url: '/v1/users'
-		}, (response) => {
-			expect(response.statusCode).to.equal(200);
-			expect(response.result).to.have.length(1);
-			done();
-		});
-	});
-	// should fail if not same user
-	// should fail if user not found
-	it('/POST:id should update a given uesr in the database.', (done) => {
-		Server.inject({
-			method: 'POST',
-			url: '/v1/users/12312'
-		}, (response) => {
-			expect(response.statusCode).to.equal(200);
-			// double check this
-			expect(response.result).to.have.length(1);
-			done();
-		});
-	});
-	it('/DELETE:id should remove a given uesr from the database.', (done) => {
-		Server.inject({
-			method: 'DELETE',
-			url: '/v1/users/12312'
-		}, (response) => {
-			expect(response.statusCode).to.equal(200);
-
-			Server.inject({
-				method: 'DELETE',
-				url: '/v1/users/12312'
-			}, (response2) => {
-				expect(response2.statusCode).to.equal(200);
-				expect(response2.result).to.have.length(0);
-				done();
-			});
-		});
-	});
-});
-
+// documentation tests, might move this later
 describe('Integration Tests - GET Documentation', () => {
-	it('Should return documentation html page.', (done) => {
-    // make API call to self to test functionality end-to-end
+	it('GET - / - Should return documentation html page.', (done) => {
 		Server.inject({
 			method: 'GET',
 			url: '/'
 		}, (response) => {
 			expect(response.statusCode).to.equal(200);
 			expect(response.result).to.be.a.string();
+			done();
+		});
+	});
+});
+
+// user tests
+describe('Integration Tests - Users', () => {
+	it(`GET - /v1/users - Should return an array of ${Config.usersPerPage} users.`, (done) => {
+		Server.inject({
+			method: 'GET',
+			url: '/v1/users'
+		}, (response) => {
+			expect(response.statusCode).to.equal(200);
+			expect(response.result).to.have.length(Config.usersPerPage);
+			done();
+		});
+	});
+	it('GET - /v1/users/{id} - Should return one user by ID.', (done) => {
+		Server.inject({
+			method: 'GET',
+			url: '/v1/users/523209c4561c640000000001'
+		}, (response) => {
+			expect(response.statusCode).to.equal(200);
+			expect(response.result.name).to.equal('name-1');
+			done();
+		});
+	});
+	it('POST - /v1/users - Should create a new user.', (done) => {
+		Server.inject({
+			method: 'POST',
+			url: '/v1/users',
+			payload: {
+				name: 'Dakota',
+			}
+		}, (response) => {
+			expect(response.statusCode).to.equal(200);
+			expect(response.result.name).to.equal('Dakota');
+			done();
+		});
+	});
+	it('POST - /v1/users/{id} - Should update a user by ID.', (done) => {
+		Server.inject({
+			method: 'POST',
+			url: '/v1/users/523209c4561c640000000014',
+			payload: {
+				name: 'last'
+			},
+		}, (response) => {
+			expect(response.statusCode).to.equal(200);
+			expect(response.result.name).to.equal('last');
 			done();
 		});
 	});

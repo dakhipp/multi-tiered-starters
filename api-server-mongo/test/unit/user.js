@@ -9,17 +9,56 @@ const lab = exports.lab = Lab.script();
 // use some BDD verbage instead of lab default
 const describe = lab.describe;
 const it = lab.it;
-// const before = lab.before;
-// const after = lab.after;
+
+const Config = require('../../server/config');
 
 // we require the handlers directly, so we can test the "Lib" functions in isolation
 const UserCtrl = require('../../server/users/user.ctrl');
 
 describe('Unit Tests - User', () => {
-	it('Should return all array of all users.', (done) => {
+	it(`Should return an array of ${Config.usersPerPage} users.`, (done) => {
     // test lib function
 		UserCtrl.lib.getUsers().then((users) => {
-			expect(users).to.be.an.array().and.have.length(10);
+			expect(users).to.be.an.array().and.have.length(Config.usersPerPage);
+			done();
+		}, (err) => {
+			done(err);
+		});
+	});
+	it('Should return one user object by ID.', (done) => {
+		const params = {
+			id: '523209c4561c640000000001',
+		};
+		UserCtrl.lib.getUser(params).then((user) => {
+			expect(user).to.be.an.object();
+			expect(user.name).to.equal('name-1');
+			done();
+		}, (err) => {
+			done(err);
+		});
+	});
+	it('Should create a user object in the database.', (done) => {
+		const payload = {
+			name: 'Dakota',
+		};
+		UserCtrl.lib.postUsers(payload).then((user) => {
+			expect(user).to.be.an.object();
+			expect(user.name).to.equal('Dakota');
+			done();
+		}, (err) => {
+			done(err);
+		});
+	});
+	it('Should update a user in the database by ID.', (done) => {
+		const params = {
+			id: '523209c4561c640000000014',
+		};
+		const payload = {
+			name: 'Last',
+		};
+		UserCtrl.lib.postUser(params, payload).then((user) => {
+			expect(user).to.be.an.object();
+			expect(user.name).to.equal('Last');
 			done();
 		}, (err) => {
 			done(err);

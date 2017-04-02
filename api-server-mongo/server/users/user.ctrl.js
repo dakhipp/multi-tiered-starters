@@ -12,16 +12,15 @@ const handlers = {};
 // business specific logic for testing
 const lib = {};
 
-lib.getUsers = function (queryObj) {
+lib.getUsers = function (query) {
 	return new Promise((resolve, reject) => {
+		const limit = Config.usersPerPage;
 		let page = 0;
-		let limit = 10;
 		let sort = 'name';
 
-		if (!queryObj === undefined) {
-			page = queryObj.page || 0;
-			limit = queryObj.limit || 10;
-			sort = queryObj.sort || 'name';
+		if (typeof query !== undefined) {
+			page = query.page;
+			sort = query.sort;
 		}
 
 		const sortObj = {};
@@ -42,29 +41,73 @@ lib.getUsers = function (queryObj) {
 	});
 };
 
-lib.getUser = function (id) {
+lib.getUser = function (params) {
 	return new Promise((resolve, reject) => {
-		db.users.find({
-			_id: id
-		})
-		.limit(1)
-		.toArray((err, docs) => {
+		db.users.findOne({
+			_id: Mongojs.ObjectId(params.id),
+		}, (err, doc) => {
 			if (err) {
 				reject(Boom.wrap(err, 'Internal MongoDB error'));
 			}
 
-			resolve(docs);
+			resolve(doc);
+		});
+	});
+};
+
+lib.postUsers = function (payload) {
+	return new Promise((resolve, reject) => {
+		db.users.save({
+			name: payload.name,
+		}, (err, doc) => {
+			if (err) {
+				reject(Boom.wrap(err, 'Internal MongoDB error'));
+			}
+
+			resolve(doc);
+		});
+	});
+};
+
+lib.postUser = function (params, payload) {
+	return new Promise((resolve, reject) => {
+		db.users.findAndModify({
+			query: {
+				_id: Mongojs.ObjectId(params.id),
+			},
+			update: {
+				$set: {
+					name: payload.name,
+				},
+			},
+			new: true,
+		}, (err, doc) => {
+			if (err) {
+				reject(Boom.wrap(err, 'Internal MongoDB error'));
+			}
+
+			resolve(doc);
 		});
 	});
 };
 
 handlers.get = function (request, reply) {
-	request.query = request.query || {};
-	if (request.query.id) {
-		reply(lib.getUser(request.query.id));
+	request.params = request.params || {};
+	if (request.params.id) {
+		reply(lib.getUser(request.params));
 	}
 	else {
 		reply(lib.getUsers(request.query));
+	}
+};
+
+handlers.post = function (request, reply) {
+	request.params = request.params || {};
+	if (request.params.id) {
+		reply(lib.postUser(request.params, request.payload));
+	}
+	else {
+		reply(lib.postUsers(request.payload));
 	}
 };
 

@@ -26,10 +26,13 @@ const dbConnectStr = `${dbUser}:${dbPass}@${dbHost}/${dbName}?authSource=admin`;
 
 const dbCollections = ['users'];
 
+const usersPerPage = 10;
+
 module.exports = {
 	host,
 	port,
 	fullHost,
 	dbConnectStr,
 	dbCollections,
+	usersPerPage,
 };

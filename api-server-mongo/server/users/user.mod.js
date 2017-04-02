@@ -23,8 +23,8 @@ module.exports = {
 			.required()
 			.description('The name of the user.')
 			.example('Luke'),
-	})
-	.label('user'),
+	}).label('user'),
+
 	// Using a getter here so that I can refer to `this`, in reference to the character node of the schema object
 	get users() {
 		return Joi
