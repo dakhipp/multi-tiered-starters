@@ -1,24 +1,18 @@
 version: 0.1
 
-environment_variables:
-  plaintext:
-    NODE_ENV: "test"
-
 phases:
-  install:
-    commands:
-      docker build -t test-env ./api-server-mongo
-      docker run test-env
   pre_build:
     commands:
-      - echo Nothing to do in the pre_build phase...
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
   build:
     commands:
       - echo Build started on `date`
-      - npm run start
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      
   post_build:
     commands:
       - echo Build completed on `date`
-artifacts:
-  files:
-    - "**/*"
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
