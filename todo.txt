@@ -1,3 +1,12 @@
+Docker Todos:
+- use exact versions for from statements, latest is not good practice
+- set up user for each docker container to avoid running as root
+- possibly remove linking in docker compose since I am using version 2 it isn't needed
+- docker-compose run <service> <command>, used to run command for testing w/ dc
+- use copy instead of volumes in order to package code for production use
+- volumes allow for local development inside docker containers, while copy is needed to get the code into the container at build time
+- info: overlay networks are needed for multi host networks
+
 API Todos:
 - make login / register routes, with goups
 - ensure making the db connection on each controller is not leaving many connections open

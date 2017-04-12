@@ -9,7 +9,7 @@
     "start": "node index.js",
     "start:dev": "pm2 start process.json --env dev ; npm run logs",
     "start:test": "npm run test ; pm2 start process.json --env test",
-    "start:prod": "pm2 start process.json --env prod",
+    "start:prod": "pm2 start process.json --env prod --no-daemon",
     "stop": "pm2 stop all",
     "delete": "pm2 delete all",
     "list": "pm2 list all",

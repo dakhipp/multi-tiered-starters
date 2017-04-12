@@ -1,16 +1,12 @@
-FROM node
+FROM node:7.8-alpine
 
 RUN mkdir /app
 WORKDIR /app
 
-COPY package.json /app
-
-RUN npm install
-
 COPY . /app
+
+RUN yarn install
 
 EXPOSE 8000
 
-ENV DOCKER true
-
-CMD ["npm", "run", "start"]
+CMD npm run start

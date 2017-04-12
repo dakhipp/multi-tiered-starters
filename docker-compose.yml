@@ -2,12 +2,16 @@
 version: "2"
 services:
   # api server
-  api:
+  proxy:
+    build: ./nginx-naxsi-proxy
+    ports:
+      ["80:80"]
+    links:
+      [mongo-api]
+  mongo-api:
     build: ./api-server-mongo
     volumes:
       - ./api-server-mongo/:/app
-    ports:
-      ["80:8000"]
     links:
       [mongo]
   # mongo db container
