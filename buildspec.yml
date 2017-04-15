@@ -3,16 +3,11 @@ version: 0.1
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login --region us-west-2
+      - docker build -t test-app ./api-server-mongo
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...          
       - docker build -t test-app ./api-server-mongo
-      - docker tag test-app:latest 690303654955.dkr.ecr.us-west-2.amazonaws.com/test-app:latest
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker image...
-      - docker push 690303654955.dkr.ecr.us-west-2.amazonaws.com/test-app:latest
+      - docker run --name test-app -d test-app
+      - docker exec test-app npm run test
