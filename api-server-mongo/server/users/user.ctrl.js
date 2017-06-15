@@ -1,6 +1,7 @@
 'use strict';
 
 const Mongojs = require('mongojs');
+const Boom = require('boom');
 
 const Config = require('../config');
 
@@ -41,24 +42,10 @@ lib.getUsers = function (query) {
 	});
 };
 
-lib.getUser = function (params) {
+lib.getUserById = function (params) {
 	return new Promise((resolve, reject) => {
 		db.users.findOne({
 			_id: Mongojs.ObjectId(params.id),
-		}, (err, doc) => {
-			if (err) {
-				reject(Boom.wrap(err, 'Internal MongoDB error'));
-			}
-
-			resolve(doc);
-		});
-	});
-};
-
-lib.postUsers = function (payload) {
-	return new Promise((resolve, reject) => {
-		db.users.save({
-			name: payload.name,
 		}, (err, doc) => {
 			if (err) {
 				reject(Boom.wrap(err, 'Internal MongoDB error'));
@@ -94,20 +81,15 @@ lib.postUser = function (params, payload) {
 handlers.get = function (request, reply) {
 	request.params = request.params || {};
 	if (request.params.id) {
-		reply(lib.getUser(request.params));
+		reply(lib.getUserId(request.params));
 	}
-	else {
-		reply(lib.getUsers(request.query));
-	}
+	reply(lib.getUsers(request.query));
 };
 
 handlers.post = function (request, reply) {
 	request.params = request.params || {};
 	if (request.params.id) {
 		reply(lib.postUser(request.params, request.payload));
-	}
-	else {
-		reply(lib.postUsers(request.payload));
 	}
 };
 

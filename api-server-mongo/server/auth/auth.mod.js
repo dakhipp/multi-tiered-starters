@@ -3,7 +3,7 @@
 const Joi = require('joi');
 
 module.exports = {
-	user: Joi.object().keys({
+	auth: Joi.object().keys({
 		// _id validation
 		// be wary of this _id validation, not sure if it is too constraining
 		_id: Joi.object().keys({
@@ -38,18 +38,10 @@ module.exports = {
 			.required()
 			.description('The email of the user.')
 			.example('fake@yahoo.com'),
-		password: Joi
+		token: Joi
 			.string()
 			.required()
-			.description('The password of the user.')
-			.example('thisIsBadPas$$word'),
-	}).label('user'),
-
-	// Using a getter here so that I can refer to `this`, in reference to the character node of the schema object
-	get users() {
-		return Joi
-			.array()
-			.items(this.user)
-			.label('list_of_users');
-	}
+			.description('The token used for future authentication.')
+			.example('eyJhbJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyzQiLCJlbWFpbCI6InRlc3RAdGVzdC50ZXN0IiwiX2lkIjoiNTk0MWVkNzM4Zjc1MWQwM2GciOiQyMzY5NTVjIiwiaWF0IjoxNDk3NDkyODUxfQ._9s1ocMklXB0x3TmLnz7yQUAZBhFWsOltea0D7sKmQYbmFtZSI6InVzZTEiLCJuYW1lIjoidGVzdCIsInBob25lX251bWJlciI6IjEyMzEyMzEyM'),
+	}).label('auth'),
 };

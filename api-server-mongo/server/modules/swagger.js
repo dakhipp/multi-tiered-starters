@@ -32,7 +32,11 @@ This API is a starter project for APIs using HapiJS.
 		jsonEditor: true,
 		tags: [{
 			'name': 'users',
-			'description': 'Working with users.'
+			'description': 'Routes that work with users.'
+		},
+		{
+			'name': 'auth',
+			'description': 'Routes that handle authentication.',
 		}],
 		// This is for use of grouping together paths.  Since each of our paths begin
 		// with `/v{1,2}`, we want to ignore those first to arguments in the path,

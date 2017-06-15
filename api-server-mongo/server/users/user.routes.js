@@ -27,8 +27,11 @@ const routes = (server) => [{
 		},
 		response: {
 			schema: Schema.users
-		}
-	}
+		},
+		// auth: {
+		// 	scope: ['ADMIN'],
+		// },
+	},
 },
 {
 	method: 'GET',
@@ -43,26 +46,6 @@ const routes = (server) => [{
 					.string()
 					.required()
 					.description('The ID of the user.'),
-			}
-		},
-		response: {
-			schema: Schema.user
-		}
-	}
-},
-{
-	method: 'POST',
-	path: '/v1/users',
-	config: {
-		handler: UserCtrl.handlers.post,
-		description: 'Posts a new user to the database.',
-		tags: ['api', 'v1', 'users'],
-		validate: {
-			payload: {
-				name: Joi
-					.string()
-					.required()
-					.description('The name of the user.'),
 			}
 		},
 		response: {
