@@ -28,21 +28,19 @@ const routes = (server) => [{
 		response: {
 			schema: Schema.users
 		},
-		// auth: {
-		// 	scope: ['ADMIN'],
-		// },
+		auth: false,
 	},
 },
 {
 	method: 'GET',
-	path: '/v1/users/{id}',
+	path: '/v1/users/{_id}',
 	config: {
 		handler: UserCtrl.handlers.get,
 		description: 'Return one user based on their ID.',
 		tags: ['api', 'v1', 'users'],
 		validate: {
 			params: {
-				id: Joi
+				_id: Joi
 					.string()
 					.required()
 					.description('The ID of the user.'),
@@ -50,7 +48,8 @@ const routes = (server) => [{
 		},
 		response: {
 			schema: Schema.user
-		}
+		},
+		auth: false,
 	}
 },
 {
@@ -72,11 +71,20 @@ const routes = (server) => [{
 					.string()
 					.required()
 					.description('The name of the user.'),
+				phone_number: Joi
+					.string()
+					.required()
+					.description('The phone number of the user.'),
+				email: Joi
+					.string()
+					.required()
+					.description('The email of the user.')
 			},
 		},
 		response: {
 			schema: Schema.user
-		}
+		},
+		auth: false,
 	}
 }];
 

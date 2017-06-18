@@ -11,7 +11,7 @@ const routes = (server) => [{
 	config: {
 		handler: AuthCtrl.handlers.register,
 		description: 'Registers a new user to the database if one doesn\'t already esist and returns token.',
-		tags: ['api', 'v1', 'auth'],
+		tags: ['api', 'v1'],
 		validate: {
 			payload: {
 				username: Joi
@@ -39,7 +39,8 @@ const routes = (server) => [{
 		response: {
 			// change to token
 			schema: Schema.auth
-		}
+		},
+		auth: false,
 	}
 },
 {
@@ -48,7 +49,7 @@ const routes = (server) => [{
 	config: {
 		handler: AuthCtrl.handlers.login,
 		description: 'Logs in an exsisting user and returns token.',
-		tags: ['api', 'v1', 'auth'],
+		tags: ['api', 'v1'],
 		validate: {
 			payload: {
 				username: Joi
@@ -64,7 +65,8 @@ const routes = (server) => [{
 		response: {
 			// change to token
 			schema: Schema.auth
-		}
+		},
+		auth: false,
 	}
 }];
 

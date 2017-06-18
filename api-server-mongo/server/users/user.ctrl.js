@@ -3,6 +3,7 @@
 const Mongojs = require('mongojs');
 const Boom = require('boom');
 
+const UserUtils = require('../utils/userUtils');
 const Config = require('../config');
 
 const db = Mongojs(Config.dbConnectStr, Config.dbCollections);
@@ -12,6 +13,22 @@ const handlers = {};
 
 // business specific logic for testing
 const lib = {};
+
+handlers.get = function (request, reply) {
+	request.params = request.params || {};
+	if (request.params._id) {
+		return reply(UserUtils.getUserById(request.params));
+	}
+	return reply(lib.getUsers(request.query));
+};
+
+handlers.post = function (request, reply) {
+	request.params = request.params || {};
+	if (request.params.id) {
+		return reply(lib.postUser(request.params, request.payload));
+	}
+	return reply(Boom.badRequest());
+};
 
 lib.getUsers = function (query) {
 	return new Promise((resolve, reject) => {
@@ -37,21 +54,7 @@ lib.getUsers = function (query) {
 				reject(Boom.wrap(err, 'Internal MongoDB error'));
 			}
 
-			resolve(docs);
-		});
-	});
-};
-
-lib.getUserById = function (params) {
-	return new Promise((resolve, reject) => {
-		db.users.findOne({
-			_id: Mongojs.ObjectId(params.id),
-		}, (err, doc) => {
-			if (err) {
-				reject(Boom.wrap(err, 'Internal MongoDB error'));
-			}
-
-			resolve(doc);
+			resolve(docs.map((user) => UserUtils.removeUnwanted(user)));
 		});
 	});
 };
@@ -63,9 +66,7 @@ lib.postUser = function (params, payload) {
 				_id: Mongojs.ObjectId(params.id),
 			},
 			update: {
-				$set: {
-					name: payload.name,
-				},
+				$set: payload,
 			},
 			new: true,
 		}, (err, doc) => {
@@ -73,24 +74,9 @@ lib.postUser = function (params, payload) {
 				reject(Boom.wrap(err, 'Internal MongoDB error'));
 			}
 
-			resolve(doc);
+			resolve(UserUtils.removeUnwanted(doc));
 		});
 	});
-};
-
-handlers.get = function (request, reply) {
-	request.params = request.params || {};
-	if (request.params.id) {
-		reply(lib.getUserId(request.params));
-	}
-	reply(lib.getUsers(request.query));
-};
-
-handlers.post = function (request, reply) {
-	request.params = request.params || {};
-	if (request.params.id) {
-		reply(lib.postUser(request.params, request.payload));
-	}
 };
 
 module.exports = {

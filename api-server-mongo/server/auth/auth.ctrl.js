@@ -3,10 +3,9 @@
 const Mongojs = require('mongojs');
 const Boom = require('boom');
 const JWT   = require('jsonwebtoken');
-const HapiAuthJWT = require('hapi-auth-jwt2');
-
 const Bcrypt = require('bcrypt');
 
+const UserUtils = require('../utils/userUtils');
 const Config = require('../config');
 
 const db = Mongojs(Config.dbConnectStr, Config.dbCollections);
@@ -24,22 +23,20 @@ handlers.register = function (request, reply) {
 		return lib.getUserByUsername({ username: request.payload.username })
 		.then((user) => {
 			if (user) {
-				return reject(Boom.badRequest('User already exsists.'));
+				throw Boom.badRequest('User already exsists.');
 			}
-
 			return lib.hashPassword(request.payload.password);
 		})
 		.then((password) => {
 			const hashedUser = request.payload;
 			hashedUser.password = password;
-
-			return lib.createUser(hashedUser);
+			return lib.createUser(lib.attachScope(hashedUser));
 		})
 		.then((createdUser) => {
-			return reply(lib.attachToken(lib.cleanUser(createdUser)));
+			return reply(lib.attachToken(UserUtils.removeUnwanted(createdUser)));
 		})
 		.catch((err) => {
-			return reply(Boom.wrap(new Error(err)));
+			return reply(Boom.wrap(err));
 		});
 	});
 };
@@ -50,22 +47,36 @@ handlers.login = function (request, reply) {
 		return lib.getUserByUsername({ username: request.payload.username })
 		.then((user) => {
 			if (!user) {
-				return reject(Boom.badRequest('User does not exsist.'));
+				throw Boom.badRequest('Invalid credentials.');
 			}
 			return lib.comparePassword(request.payload.password, user);
 		})
 		.then((validatedUser) => {
-			return reply(lib.attachToken(lib.cleanUser(validatedUser)));
+			return reply(lib.attachToken(UserUtils.removeUnwanted(validatedUser)));
 		})
 		.catch((err) => {
-			return reply(Boom.wrap(new Error(err)));
+			return reply(Boom.wrap(err));
 		});
 	});
 };
 
-// scrubs unwanted properties off of user based on whitelist array
-lib.cleanUser = function (user) {
-	delete user.password;
+// validates a user based on their jwt token on the Authorization header
+handlers.validate = function (decoded, request, callback) {
+	UserUtils.getUserById(decoded)
+	.then((userFromToken) => {
+		if (!userFromToken) {
+			return callback(null, false);
+		}
+		// do a role check, using the retured user's scope
+		return callback(null, true, { scope: userFromToken.scope });
+	})
+	.catch((err) => {
+		return reply(Boom.wrap(err));
+	});
+};
+
+lib.attachScope = function (user) {
+	user.scope = 'USER';
 	return user;
 };
 
@@ -109,7 +120,7 @@ lib.comparePassword = function (plainPass, hashedPassUser) {
 				return reject(err);
 			}
 			if (!res) {
-				return reject(Boom.badRequest('Wrong credentials.'));
+				return reject(Boom.badRequest('Invalid credentials.'));
 			}
 			return resolve(hashedPassUser);
 		});

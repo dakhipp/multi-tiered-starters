@@ -38,11 +38,6 @@ module.exports = {
 			.required()
 			.description('The email of the user.')
 			.example('fake@yahoo.com'),
-		password: Joi
-			.string()
-			.required()
-			.description('The password of the user.')
-			.example('thisIsBadPas$$word'),
 	}).label('user'),
 
 	// Using a getter here so that I can refer to `this`, in reference to the character node of the schema object

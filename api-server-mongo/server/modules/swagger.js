@@ -35,6 +35,10 @@ This API is a starter project for APIs using HapiJS.
 			'description': 'Routes that work with users.'
 		},
 		{
+			'name': 'roles',
+			'description': 'Routes used to test authentication roles.',
+		},
+		{
 			'name': 'auth',
 			'description': 'Routes that handle authentication.',
 		}],

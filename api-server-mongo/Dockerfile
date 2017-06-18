@@ -5,8 +5,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN yarn install
-
 EXPOSE 8000
 
-CMD npm run start
+CMD yarn install ; yarn run start
