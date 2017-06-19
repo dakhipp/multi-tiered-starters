@@ -12,7 +12,11 @@ const seedUser = function (i) {
 		db.users.save({
 			// takes into account 0s, 01, 02, ..., 11
 			'_id': Mongojs.ObjectId(`523209c4561c6400000000${('0' + i).slice(-2)}`),
-			'name': `name-${i}`,
+			'name': `name-${('0' + i).slice(-2)}`,
+			'username': `user-${('0' + i).slice(-2)}`,
+			'password': `pass-${('0' + i).slice(-2)}`,
+			'email': `email-${('0' + i).slice(-2)}@test.com`,
+			'phone_number': `123-123-12${('0' + i).slice(-2)}`,
 		}, (err, doc) => {
 			if (err) {
 				return reject(err);

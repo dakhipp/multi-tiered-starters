@@ -55,30 +55,17 @@ describe('Integration Tests - Users', () => {
 			done();
 		});
 	});
-	it('GET - /v1/users/{id} - Should return one user by ID.', (done) => {
+	it('GET - /v1/users/{_id} - Should return one user by ID.', (done) => {
 		Server.inject({
 			method: 'GET',
 			url: '/v1/users/523209c4561c640000000001'
 		}, (response) => {
 			expect(response.statusCode).to.equal(200);
-			expect(response.result.name).to.equal('name-1');
+			expect(response.result.name).to.equal('name-01');
 			done();
 		});
 	});
-	it('POST - /v1/users - Should create a new user.', (done) => {
-		Server.inject({
-			method: 'POST',
-			url: '/v1/users',
-			payload: {
-				name: 'Dakota',
-			}
-		}, (response) => {
-			expect(response.statusCode).to.equal(200);
-			expect(response.result.name).to.equal('Dakota');
-			done();
-		});
-	});
-	it('POST - /v1/users/{id} - Should update a user by ID.', (done) => {
+	it('POST - /v1/users/{_id} - Should update a user by ID.', (done) => {
 		Server.inject({
 			method: 'POST',
 			url: '/v1/users/523209c4561c640000000014',

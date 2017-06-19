@@ -54,14 +54,14 @@ const routes = (server) => [{
 },
 {
 	method: 'POST',
-	path: '/v1/users/{id}',
+	path: '/v1/users/{_id}',
 	config: {
 		handler: UserCtrl.handlers.post,
 		description: 'Updates a user based on their ID.',
 		tags: ['api', 'v1', 'users'],
 		validate: {
 			params: {
-				id: Joi
+				_id: Joi
 					.string()
 					.required()
 					.description('The ID of the user.'),
@@ -69,20 +69,20 @@ const routes = (server) => [{
 			payload: {
 				name: Joi
 					.string()
-					.required()
+					.allow('')
 					.description('The name of the user.'),
 				phone_number: Joi
 					.string()
-					.required()
+					.allow('')
 					.description('The phone number of the user.'),
 				email: Joi
 					.string()
-					.required()
-					.description('The email of the user.')
+					.allow('')
+					.description('The email of the user.'),
 			},
 		},
 		response: {
-			schema: Schema.user
+			schema: Schema.user,
 		},
 		auth: false,
 	}

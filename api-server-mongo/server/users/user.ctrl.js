@@ -17,14 +17,20 @@ const lib = {};
 handlers.get = function (request, reply) {
 	request.params = request.params || {};
 	if (request.params._id) {
-		return reply(UserUtils.getUserById(request.params));
+		return UserUtils.getUserById(request.params)
+		.then((user) => {
+			return reply(UserUtils.removeUnwanted(user));
+		})
+		.catch((err) => {
+			return reply(err);
+		});
 	}
 	return reply(lib.getUsers(request.query));
 };
 
 handlers.post = function (request, reply) {
 	request.params = request.params || {};
-	if (request.params.id) {
+	if (request.params._id) {
 		return reply(lib.postUser(request.params, request.payload));
 	}
 	return reply(Boom.badRequest());
@@ -51,30 +57,35 @@ lib.getUsers = function (query) {
 		.skip(page * limit)
 		.toArray((err, docs) => {
 			if (err) {
-				reject(Boom.wrap(err, 'Internal MongoDB error'));
+				return reject(Boom.wrap(err, 'Internal MongoDB error'));
 			}
 
-			resolve(docs.map((user) => UserUtils.removeUnwanted(user)));
+			return resolve(docs.map((user) => UserUtils.removeUnwanted(user)));
 		});
 	});
+};
+
+lib.removeEmpty = function (obj) {
+	Object.keys(obj).forEach((key) => (obj[key] === '') && delete obj[key]);
+	return obj;
 };
 
 lib.postUser = function (params, payload) {
 	return new Promise((resolve, reject) => {
 		db.users.findAndModify({
 			query: {
-				_id: Mongojs.ObjectId(params.id),
+				_id: Mongojs.ObjectId(params._id),
 			},
 			update: {
-				$set: payload,
+				$set: lib.removeEmpty(payload),
 			},
 			new: true,
 		}, (err, doc) => {
 			if (err) {
-				reject(Boom.wrap(err, 'Internal MongoDB error'));
+				return reject(Boom.wrap(err, 'Internal MongoDB error'));
 			}
 
-			resolve(UserUtils.removeUnwanted(doc));
+			return resolve(UserUtils.removeUnwanted(doc));
 		});
 	});
 };
