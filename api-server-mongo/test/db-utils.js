@@ -52,7 +52,7 @@ const emptyUsers = function () {
 			if (err) {
 				return reject(err);
 			}
-			return resolve(doc);
+			return resolve(docs);
 		});
 	});
 };

@@ -2,7 +2,7 @@
 
 // See: https://github.com/hapijs/good
 
-module.exports = {
+const goodConfigObj = {
 	register: require('good'),
 	options: {
 		reporters: {
@@ -21,3 +21,10 @@ module.exports = {
 		}
 	}
 };
+
+// turn off logging for clearer test output
+if (process.env.NODE_ENV === 'test') {
+	delete goodConfigObj.options.reporters.console[0].args;
+}
+
+module.exports = goodConfigObj;

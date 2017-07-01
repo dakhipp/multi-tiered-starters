@@ -43,4 +43,40 @@ describe('Unit Tests - Auth', () => {
 			done(err);
 		});
 	});
+
+	// holds hashed password after first test so it can be checked later
+	const fakeHashedUser = {
+		password: ''
+	};
+	// holds password to be tested against
+	const badPassword = 'password123!';
+
+	it('Should take a text password and return the salted and hashed version.', (done) => {
+		AuthCtrl.lib.hashPassword(badPassword).then((hashedPassword) => {
+			fakeHashedUser.password = hashedPassword;
+			expect(hashedPassword).to.be.an.string();
+			done();
+		}, (err) => {
+			done(err);
+		});
+	});
+
+	it('Should compare a plain text password to the hashed version.', (done) => {
+		AuthCtrl.lib.comparePassword(badPassword, fakeHashedUser).then((user) => {
+			expect(user).to.be.an.object();
+			done();
+		}, (err) => {
+			done(err);
+		});
+	});
+
+	it('Should return a user from the database based on their username.', (done) => {
+		AuthCtrl.lib.getUserByUsername({ username: 'user123' }).then((user) => {
+			expect(user).to.be.an.object();
+			expect(user.name).to.equal('newUser');
+			done();
+		}, (err) => {
+			done(err);
+		});
+	});
 });

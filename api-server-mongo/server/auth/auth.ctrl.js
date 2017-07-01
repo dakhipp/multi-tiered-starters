@@ -75,6 +75,7 @@ handlers.validate = function (decoded, request, callback) {
 	});
 };
 
+// attaches default scope of USER to user object
 lib.attachScope = function (user) {
 	user.scope = 'USER';
 	return user;
