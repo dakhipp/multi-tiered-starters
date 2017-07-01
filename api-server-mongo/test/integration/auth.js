@@ -9,9 +9,6 @@ const DBUtils = require('../db-utils');
 // use some BDD verbage instead of lab default
 const describe = lab.describe;
 const it = lab.it;
-const before = lab.before;
-
-const Config = require('../../server/config');
 
 // require hapi server
 const Server = require('../../server');
