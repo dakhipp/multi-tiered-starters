@@ -24,22 +24,8 @@ before((done) => {
 	DBUtils.seedNUsers(USERS_TO_SEED)
 	.then((res) => {
 		// eslint-disable-next-line
-		console.log(`DB seeded with ${USERS_TO_SEED} users.`);
+		// console.log(`DB seeded with ${USERS_TO_SEED} users.`);
 		done();
-	});
-});
-
-// documentation tests, might move this later
-describe('Integration Tests - GET Documentation', () => {
-	it('GET - / - Should return documentation html page.', (done) => {
-		Server.inject({
-			method: 'GET',
-			url: '/'
-		}, (response) => {
-			expect(response.statusCode).to.equal(200);
-			expect(response.result).to.be.a.string();
-			done();
-		});
 	});
 });
 
@@ -75,6 +61,20 @@ describe('Integration Tests - Users', () => {
 		}, (response) => {
 			expect(response.statusCode).to.equal(200);
 			expect(response.result.name).to.equal('last');
+			done();
+		});
+	});
+});
+
+// documentation tests, might move this later
+describe('Integration Tests - GET Documentation', () => {
+	it('GET - / - Should return documentation html page.', (done) => {
+		Server.inject({
+			method: 'GET',
+			url: '/'
+		}, (response) => {
+			expect(response.statusCode).to.equal(200);
+			expect(response.result).to.be.a.string();
 			done();
 		});
 	});
