@@ -13,7 +13,7 @@ const it = lab.it;
 const Config = require('../../server/config');
 
 // we require the handlers directly, so we can test the "Lib" functions in isolation
-const UserCtrl = require('../../server/users/user.ctrl');
+const UserCtrl = require('../../server/routes/users/user.ctrl');
 const UserUtils = require('../../server/utils/userUtils');
 
 describe('Unit Tests - User', () => {
@@ -36,6 +36,19 @@ describe('Unit Tests - User', () => {
 			done();
 		}, (err) => {
 			done(err);
+		});
+	});
+	it('Should cause an error by attempting to get a user with an invalid ID.', (done) => {
+		const params = {
+			_id: '000000000000000000000000',
+		};
+		UserUtils.getUserById(params).then(() => {
+			// should not ever hit here, will always throw error
+			done(new Error('Should not get here.'));
+		}, (error) => {
+			expect(error).to.be.an.object();
+			expect(error.message).to.equal('Bad Request');
+			done();
 		});
 	});
 	it('Should update a user in the database by ID.', (done) => {

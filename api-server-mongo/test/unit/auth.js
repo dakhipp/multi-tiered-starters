@@ -12,7 +12,7 @@ const describe = lab.describe;
 const it = lab.it;
 
 // we require the handlers directly, so we can test the "Lib" functions in isolation
-const AuthCtrl = require('../../server/auth/auth.ctrl');
+const AuthCtrl = require('../../server/routes/auth/auth.ctrl');
 
 describe('Unit Tests - Auth', () => {
 	it('Should attach a default scope of USER to a user object.', (done) => {

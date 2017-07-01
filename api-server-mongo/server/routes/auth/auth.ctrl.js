@@ -5,8 +5,8 @@ const Boom = require('boom');
 const JWT   = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
 
-const UserUtils = require('../utils/userUtils');
-const Config = require('../config');
+const UserUtils = require('../../utils/userUtils');
+const Config = require('../../config');
 
 const db = Mongojs(Config.dbConnectStr, Config.dbCollections);
 
@@ -57,21 +57,6 @@ handlers.login = function (request, reply) {
 		.catch((err) => {
 			return reply(Boom.wrap(err));
 		});
-	});
-};
-
-// validates a user based on their jwt token on the Authorization header
-handlers.validate = function (decoded, request, callback) {
-	UserUtils.getUserById(decoded)
-	.then((userFromToken) => {
-		if (!userFromToken) {
-			return callback(null, false);
-		}
-		// do a role check, using the retured user's scope
-		return callback(null, true, { scope: userFromToken.scope });
-	})
-	.catch((err) => {
-		return reply(Boom.wrap(err));
 	});
 };
 

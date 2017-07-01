@@ -3,10 +3,10 @@
 
 const Hapi = require('hapi');
 
-const Config = require('./server/config');
-const Routes = require('./server/routes');
-const Plugins = require('./server/modules/plugins');
-const AuthCtrl = require('./server/auth/auth.ctrl');
+const Config = require('./config');
+const Routes = require('./routes');
+const Plugins = require('./modules/plugins');
+const Validate = require('./utils/validation');
 
 const server = new Hapi.Server();
 
@@ -22,7 +22,7 @@ server.register(Plugins, (err) => {
 
 	server.auth.strategy('jwt', 'jwt', {
 		key: Config.jwtSecret,
-		validateFunc: AuthCtrl.handlers.validate,
+		validateFunc: Validate.JwtValidate,
 		verifyOptions: {
 			algorithms: ['HS256'],
 		}

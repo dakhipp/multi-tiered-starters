@@ -14,7 +14,7 @@ const before = lab.before;
 const Config = require('../../server/config');
 
 // require hapi server
-const Server = require('../../');
+const Server = require('../../server');
 
 // TODO: create get route testing sort query param
 

@@ -1,7 +1,7 @@
 'use strict';
 
 const host = process.env.HOST || '0.0.0.0';
-const	port = process.env.PORT || 8000;
+const port = process.env.PORT || 8000;
 
 const fullHost = `http://${host}:${port}`;
 

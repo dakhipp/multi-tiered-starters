@@ -3,8 +3,8 @@
 const Mongojs = require('mongojs');
 const Boom = require('boom');
 
-const UserUtils = require('../utils/userUtils');
-const Config = require('../config');
+const UserUtils = require('../../utils/userUtils');
+const Config = require('../../config');
 
 const db = Mongojs(Config.dbConnectStr, Config.dbCollections);
 

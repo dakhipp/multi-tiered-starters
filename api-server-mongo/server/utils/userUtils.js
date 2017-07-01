@@ -23,8 +23,8 @@ const getUserById = function (params) {
 		db.users.findOne({
 			_id: Mongojs.ObjectId(params._id),
 		}, (err, doc) => {
-			if (err) {
-				reject(Boom.wrap(err, 'Internal MongoDB error'));
+			if (!doc || err) {
+				reject(Boom.badRequest());
 			}
 			resolve(doc);
 		});

@@ -1,12 +1,12 @@
 {
-  "name": "swagger-enabled-api-server",
+  "name": "swagger-enabled-mongo-api-server",
   "version": "1.0.0",
-  "description": "A starter project for a swagger enabled api.",
+  "description": "A starter project for a swagger enabled api using mongodb.",
   "main": "index.js",
   "scripts": {
     "test": "lab -v -L --lint-warnings-threshold 20 -C -D -c -t 80 ",
     "cover": "lab -r html -o coverage.html",
-    "start": "node index.js",
+    "start": "node ./server/index.js",
     "start:dev": "pm2 start process.json --env dev ; npm run logs",
     "start:test": "npm run test ; pm2 start process.json --env test",
     "start:prod": "pm2 start process.json --env prod --no-daemon",

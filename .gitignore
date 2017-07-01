@@ -5,3 +5,4 @@ node_modules
 *er.txt
 todo.txt
 **/todo.txt
+**/coverage.html
