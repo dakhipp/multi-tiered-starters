@@ -1,4 +1,4 @@
-FROM node:7.8-alpine
+FROM node:6-alpine
 
 RUN mkdir /app
 WORKDIR /app
@@ -7,4 +7,6 @@ COPY . /app
 
 EXPOSE 8000
 
-CMD yarn install ; yarn run start
+RUN apk --no-cache add --virtual builds-deps build-base python && yarn install && apk del builds-deps
+
+CMD yarn run start

@@ -17,7 +17,7 @@ const jwtSecret = process.env.JWTSECRET;
 let dbHost = process.env.DBHOST;
 // if ENV var DOCKER === true use docker db link name instead
 if (process.env.DOCKER === 'true') {
-	dbHost = 'mongo';
+	dbHost = 'mongodb';
 }
 
 // set default db name based on .env file, overwrite if testing

@@ -3,6 +3,7 @@
 const Code = require('code');
 const expect = Code.expect;
 const Lab = require('lab');
+const _ = require('lodash');
 const lab = exports.lab = Lab.script();
 const DBUtils = require('../db-utils');
 
@@ -35,7 +36,7 @@ describe('Integration Tests - Auth', () => {
 		}, (response) => {
 			expect(response.statusCode).to.equal(200);
 			expect(response.result).to.be.an.object();
-			// TODO: check for token
+			expect(_.get(response.result, 'token')).to.be.a.string();
 			done();
 		});
 	});
@@ -73,7 +74,7 @@ describe('Integration Tests - Auth', () => {
 			token = response.result.token;
 			expect(response.statusCode).to.equal(200);
 			expect(response.result).to.be.an.object();
-			// TODO: check for token
+			expect(_.get(response.result, 'token')).to.be.a.string();
 			done();
 		});
 	});

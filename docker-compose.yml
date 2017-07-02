@@ -1,21 +1,23 @@
 # create a docker-compose.yml file
 version: "2"
 services:
-  # api server
   proxy:
     build: ./nginx-naxsi-proxy
     ports:
       ["80:80"]
     links:
-      [mongo-api]
+      ["mongo-api"]
   mongo-api:
     build: ./api-server-mongo
-    volumes:
-      - ./api-server-mongo/:/app
+    ports: 
+      ["8000"]
     links:
-      [mongo]
-  # mongo db container
-  mongo:
-    image: mongo
-    ports:
+      ["mongodb"]
+    environment:
+      - DOCKER=true
+  # still doesn't really work, need to bash into the container and add the user manually
+  mongodb:
+    build: ./mongo-db
+    ports: 
       ["27017:27017"]
+    command: mongod --auth
