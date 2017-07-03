@@ -1,27 +1,23 @@
 'use strict';
 
-const Mongojs = require('mongojs');
-
-const Config = require('../server/config');
-
-const db = Mongojs(Config.dbConnectStr, Config.dbCollections);
+const UserModel = require('../server/routes/users/user.mod').sql;
 
 // seeds a user
 const seedUser = function (i) {
 	return new Promise((resolve, reject) => {
-		db.users.save({
-			// takes into account 0s, 01, 02, ..., 11
-			'_id': Mongojs.ObjectId(`523209c4561c6400000000${('0' + i).slice(-2)}`),
+		UserModel.create({
+			'id': i,
 			'name': `name-${('0' + i).slice(-2)}`,
 			'username': `user-${('0' + i).slice(-2)}`,
 			'password': `pass-${('0' + i).slice(-2)}`,
 			'email': `email-${('0' + i).slice(-2)}@test.com`,
 			'phone_number': `123-123-12${('0' + i).slice(-2)}`,
-		}, (err, doc) => {
-			if (err) {
-				return reject(err);
-			}
-			resolve(doc);
+		})
+		.then((user) => {
+			return resolve(user);
+		})
+		.catch((err) => {
+			reject(err);
 		});
 	});
 };
@@ -32,15 +28,15 @@ const seedNUsers = function (n) {
 		const promises = [];
 
 		for (let i = 0; i < n; i += 1) {
-			promises.push(seedUser(i));
+			promises.push(seedUser(i + 1));
 		}
 
-		Promise.all(promises)
+		return Promise.all(promises)
 		.then((values) => {
-			resolve(values);
+			return resolve(values);
 		})
 		.catch((err) => {
-			reject(err);
+			return reject(err);
 		});
 	});
 };
@@ -48,12 +44,7 @@ const seedNUsers = function (n) {
 // empties user database
 const emptyUsers = function () {
 	return new Promise((resolve, reject) => {
-		db.users.remove({}, (err, docs) => {
-			if (err) {
-				return reject(err);
-			}
-			return resolve(docs);
-		});
+		UserModel.destroy({ where: {} });
 	});
 };
 

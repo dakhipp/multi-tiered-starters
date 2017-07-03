@@ -4,7 +4,7 @@
   "description": "A starter project for a swagger enabled API server using PosgreSQL.",
   "main": "./server/index.js",
   "scripts": {
-    "test": "lab -v -L --lint-warnings-threshold 20 -C -D -c -t 80 ",
+    "test": "lab -v -L --lint-warnings-threshold 20 -C -D -c -t 80",
     "cover": "lab -r html -o coverage.html",
     "start": "node ./server/index.js",
     "start:dev": "pm2 start process.json --env dev ; npm run logs",

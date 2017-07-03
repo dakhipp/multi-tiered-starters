@@ -8,7 +8,8 @@ const User = Db.define('User', {
 	username: Sequelize.STRING,
 	phone_number: Sequelize.STRING,
 	email: Sequelize.STRING,
-	password: Sequelize.STRING
+	password: Sequelize.STRING,
+	scope: Sequelize.STRING
 }, {
 	classMethods: {
 		associate: function (models) {

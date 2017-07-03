@@ -82,12 +82,9 @@ lib.postUser = function (params, payload) {
 			}
 		)
 		.then((user) => {
-			console.log(user);
-			console.log(user[1][0]);
 			return resolve(UserUtils.removeUnwanted(user[1][0]));
 		})
 		.catch((err) => {
-			console.log('hit 2');
 			return reject(Boom.wrap(err, 'Internal db error'));
 		});
 	});

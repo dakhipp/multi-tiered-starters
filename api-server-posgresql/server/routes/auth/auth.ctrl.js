@@ -20,8 +20,8 @@ handlers.register = function (request, reply) {
 	return new Promise((resolve, reject) => {
 		// check if user already exsists
 		return lib.getUserByUsername({ username: request.payload.username })
-		.then((results) => {
-			if (results.length) {
+		.then((user) => {
+			if (user) {
 				throw Boom.badRequest('User already exsists.');
 			}
 			return lib.hashPassword(request.payload.password);
@@ -45,10 +45,10 @@ handlers.login = function (request, reply) {
 	return new Promise((resolve, reject) => {
 		return lib.getUserByUsername({ username: request.payload.username })
 		.then((user) => {
-			if (!user.length) {
+			if (!user) {
 				throw Boom.badRequest('Invalid credentials.');
 			}
-			return lib.comparePassword(request.payload.password, user[0]);
+			return lib.comparePassword(request.payload.password, user);
 		})
 		.then((validatedUser) => {
 			return reply(lib.attachToken(UserUtils.removeUnwanted(validatedUser)));
@@ -121,7 +121,7 @@ lib.getUserByUsername = function (params) {
 			}
 		})
 		.then((result) => {
-			return resolve(result);
+			return resolve(result[0]);
 		})
 		.catch((err) => {
 			return reject(Boom.wrap(err, 'Internal db error'));

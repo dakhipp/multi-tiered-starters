@@ -30,7 +30,7 @@ describe('Unit Tests - Auth', () => {
 	it('Should create a new user in the database and return the user.', (done) => {
 		const payload = {
 			name: 'newUser',
-			username: 'user123',
+			username: 'use888',
 			phone_number: '123-123-1234',
 			email: 'fake@yahoo.com',
 			password: 'testpass'
@@ -71,9 +71,9 @@ describe('Unit Tests - Auth', () => {
 	});
 
 	it('Should return a user from the database based on their username.', (done) => {
-		AuthCtrl.lib.getUserByUsername({ username: 'user123' }).then((user) => {
+		AuthCtrl.lib.getUserByUsername({ username: 'user-02' }).then((user) => {
 			expect(user).to.be.an.object();
-			expect(user.name).to.equal('newUser');
+			expect(user.name).to.equal('name-02');
 			done();
 		}, (err) => {
 			done(err);

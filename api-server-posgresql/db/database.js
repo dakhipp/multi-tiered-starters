@@ -7,7 +7,5 @@ sequelizeConfig.production = sequelizeConfig;
 sequelizeConfig.test = sequelizeConfig;
 sequelizeConfig.development = sequelizeConfig;
 
-console.log(sequelizeConfig);
-
 // Export final database config
 module.exports = sequelizeConfig;

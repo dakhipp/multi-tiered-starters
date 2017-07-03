@@ -5,7 +5,6 @@ const expect = Code.expect;
 const Lab = require('lab');
 const _ = require('lodash');
 const lab = exports.lab = Lab.script();
-const DBUtils = require('../db-utils');
 
 // use some BDD verbage instead of lab default
 const describe = lab.describe;
@@ -13,8 +12,6 @@ const it = lab.it;
 
 // require hapi server
 const Server = require('../../server');
-
-DBUtils.emptyUsers();
 
 // holds token after login to test the following role routes
 let token = '';

@@ -20,6 +20,7 @@ const Server = require('../../server');
 
 // seed the db
 before((done) => {
+	DBUtils.emptyUsers();
 	const USERS_TO_SEED = 15;
 	DBUtils.seedNUsers(USERS_TO_SEED)
 	.then((res) => {
@@ -41,20 +42,20 @@ describe('Integration Tests - Users', () => {
 			done();
 		});
 	});
-	it('GET - /v1/users/{_id} - Should return one user by ID.', (done) => {
+	it('GET - /v1/users/{id} - Should return one user by ID.', (done) => {
 		Server.inject({
 			method: 'GET',
-			url: '/v1/users/523209c4561c640000000001'
+			url: '/v1/users/1'
 		}, (response) => {
 			expect(response.statusCode).to.equal(200);
 			expect(response.result.name).to.equal('name-01');
 			done();
 		});
 	});
-	it('POST - /v1/users/{_id} - Should update a user by ID.', (done) => {
+	it('POST - /v1/users/{id} - Should update a user by ID.', (done) => {
 		Server.inject({
 			method: 'POST',
-			url: '/v1/users/523209c4561c640000000014',
+			url: '/v1/users/15',
 			payload: {
 				name: 'last'
 			},

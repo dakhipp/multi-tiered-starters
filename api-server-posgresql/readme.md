@@ -6,3 +6,6 @@ node_modules/.bin/sequelize migration:create --name add-birthday-to-user
 
 Runs migrate file or files:
 node_modules/.bin/sequelize db:migrate
+
+
+NODE_ENV=test node_modules/.bin/sequelize db:migrate

@@ -1,6 +1,6 @@
 {
   "apps" : [{
-    "name": "mongo-api-server",
+    "name": "posgresql-api-server",
     "script": "./server/index.js",
     "watch": true,
     "instances": 3,

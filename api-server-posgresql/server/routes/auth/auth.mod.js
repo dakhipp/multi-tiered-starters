@@ -2,6 +2,7 @@
 
 const Joi = require('joi');
 
+// eslint-disable-next-line hapi/hapi-capitalize-modules
 const sql = require('../../../db/models/user');
 
 const joi = {
