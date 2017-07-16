@@ -60,6 +60,18 @@ export default class DefaultLayout extends React.Component {
 	        		style={style.link}
 	        	>About</Link>
 	        </MenuItem>
+	        <MenuItem onClick={this.closeDrawer}>
+	        	<Link 
+	        		to="/login"
+	        		style={style.link}
+	        	>Login</Link>
+	        </MenuItem>
+	        <MenuItem onClick={this.closeDrawer}>
+	        	<Link 
+	        		to="/register"
+	        		style={style.link}
+	        	>Register</Link>
+	        </MenuItem>
 	      </Drawer>
 	      <div style={style.pageContainer}>
 		      {this.props.children}

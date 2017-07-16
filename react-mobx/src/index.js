@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import createBrowserHistory from 'history/createBrowserHistory'
+import promiseFinally from 'promise.prototype.finally';
+import { useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
-import { RouterStore, syncHistoryWithStore } from 'mobx-react-router'
 import { Router, Route } from 'react-router'
 
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
@@ -13,12 +13,15 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 import DefaultLayout from './layouts/DefaultLayout'
 import Home from './components/Home'
 import About from './components/About'
+// import Login from './components/Login'
+import Register from './components/Register'
 
-import './registerServiceWorker';
-import './index.css'
+import routerStore, { history } from './stores/routerStore';
+import authStore from './stores/authStore';
 
-const browserHistory = createBrowserHistory()
-const routingStore = new RouterStore()
+import './registerServiceWorker'
+import './css/index.css'
+
 
 injectTapEventPlugin()
 
@@ -37,10 +40,12 @@ const muiTheme = getMuiTheme({
 
 // can add other stores to share properties globaly using @inject and @observer
 const stores = {
-  routing: routingStore,
+  routing: routerStore,
+  authStore
 };
 
-const history = syncHistoryWithStore(browserHistory, routingStore);
+promiseFinally.shim();
+useStrict(true);
 
 ReactDOM.render(
   <Provider {...stores}>
@@ -49,6 +54,8 @@ ReactDOM.render(
 	      <DefaultLayout>
 	        <Route exact path="/" component={Home} />
 	        <Route path="/about" component={About} />
+	        { /* <Route path="/login" component={Login} /> */ }
+	        <Route path="/register" component={Register} />
 	      </DefaultLayout>
 	    </Router>
 	  </MuiThemeProvider>

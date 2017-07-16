@@ -1062,6 +1062,12 @@ hapi-capitalize-modules@1.x.x:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/hapi-capitalize-modules/-/hapi-capitalize-modules-1.1.6.tgz#7991171415e15e6aa3231e64dda73c8146665318"
 
+hapi-cors@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/hapi-cors/-/hapi-cors-1.0.1.tgz#ecb636524bcea7b6cbd457cb7a2434f58127cca9"
+  dependencies:
+    joi "^7.0.1"
+
 hapi-for-you@1.x.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/hapi-for-you/-/hapi-for-you-1.0.0.tgz#d362fbee8d7bda9c2c7801e207e5a5cd1a0b6a7b"
@@ -1146,6 +1152,10 @@ heavy@4.x.x:
 hoek@2.x.x:
   version "2.16.3"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-2.16.3.tgz#20bb7403d3cea398e91dc4710a8ff1b8274a25ed"
+
+hoek@3.x.x:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/hoek/-/hoek-3.0.4.tgz#268adff66bb6695c69b4789a88b1e0847c3f3123"
 
 hoek@4.x.x, hoek@^4.0.1:
   version "4.1.1"
@@ -1395,6 +1405,15 @@ joi@^6.10.1:
     isemail "1.x.x"
     moment "2.x.x"
     topo "1.x.x"
+
+joi@^7.0.1:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-7.3.0.tgz#4d9c9f181830444083665b5b6cd5b8ca6779a5e9"
+  dependencies:
+    hoek "3.x.x"
+    isemail "2.x.x"
+    moment "2.x.x"
+    topo "2.x.x"
 
 js-tokens@^3.0.0:
   version "3.0.1"
