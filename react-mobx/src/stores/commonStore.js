@@ -1,24 +1,29 @@
 import { observable, action, reaction } from 'mobx';
 
 class CommonStore {
-  @observable token = window.localStorage.getItem('jwt');
   @observable appLoaded = false;
+
+  @observable iam = JSON.parse(window.localStorage.getItem('iam'));
 
   constructor() {
     reaction(
-      () => this.token,
-      token => {
-        if (token) {
-          window.localStorage.setItem('jwt', token);
+      () => this.iam,
+      iam => {
+        if (iam) {
+          window.localStorage.setItem('iam', JSON.stringify(iam));
         } else {
-          window.localStorage.removeItem('jwt');
+          window.localStorage.removeItem('iam');
         }
       }
     );
   }
 
-  @action setToken(token) {
-    this.token = token;
+  @action forgetIam() {
+    this.iam = undefined;
+  }
+
+  @action setIam(iam) {
+  	this.iam = iam;
   }
 
   @action setAppLoaded() {

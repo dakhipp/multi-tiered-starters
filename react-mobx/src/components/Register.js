@@ -9,30 +9,45 @@ export default class Register extends React.Component {
 	constructor() {
 		super();
 
-		this.submitForm = (name, username, email, password, phone) => ev => {
-      ev.preventDefault();
-      this.props.onSubmit(name, username, email, password, phone);
-    }
+		this.handleNameChange = this.handleNameChange.bind(this);
+		this.handleUsernameChange = this.handleUsernameChange.bind(this);
+		this.handleEmailChange = this.handleEmailChange.bind(this);
+		this.handlePasswordChange = this.handlePasswordChange.bind(this);
+		this.handlePhoneChange = this.handlePhoneChange.bind(this);
+		this.handleSubmitForm = this.handleSubmitForm.bind(this);
 	}
 
 	componentWillUnmount() {
 		this.props.authStore.reset();
 	}
 
-	handleNameChange = e => this.props.authStore.setName(e.target.value);
-	handleUsernameChange = e => this.props.authStore.setUsername(e.target.value);
-  handleEmailChange = e => this.props.authStore.setEmail(e.target.value);
-  handlePasswordChange = e => this.props.authStore.setPassword(e.target.value);
-  handlePhoneChange = e => this.props.authStore.setPhone(e.target.value);
-	handleSubmitForm = (e) => {
+	handleNameChange(e) {
+		this.props.authStore.setName(e.target.value);
+	}
+
+	handleUsernameChange(e) {
+		this.props.authStore.setUsername(e.target.value);
+  }
+
+  handleEmailChange(e) {
+		this.props.authStore.setEmail(e.target.value);
+  }
+
+  handlePasswordChange(e) {
+		this.props.authStore.setPassword(e.target.value);
+  }
+
+  handlePhoneChange(e) {
+		this.props.authStore.setPhone(e.target.value);
+	}
+
+	handleSubmitForm(e) {
     e.preventDefault();
     this.props.authStore.register()
   };
 
 	render() {
-    const { values, errors, inProgress } = this.props.authStore;
-
-    console.log(errors);
+    const { values, inProgress } = this.props.authStore;
 
 		return (
 			<div>

@@ -1,8 +1,7 @@
 import { observable, action } from 'mobx';
 import agent from '../agent';
-import userStore from './userStore';
-import commonStore from './commonStore';
 
+import commonStore from './commonStore';
 import routerStore from './routerStore';
 
 class AuthStore {
@@ -48,10 +47,11 @@ class AuthStore {
   @action login() {
     this.inProgress = true;
     this.errors = undefined;
-    return agent.Auth.login(this.values.email, this.values.password)
-      .then(({ user }) => commonStore.setToken(user.token))
-      .then(() => userStore.pullUser())
-      .then(() => routerStore.push('/'))
+    return agent.Auth.login(this.values.username, this.values.password)
+      .then((user) => {
+      	routerStore.push('/');
+      	commonStore.setIam(user);
+      })
       .catch(action((err) => {
         this.errors = err.response && err.response.body && err.response.body.errors;
         throw err;
@@ -60,15 +60,13 @@ class AuthStore {
   }
 
   @action register() {
-  	console.log(this);
     this.inProgress = true;
     this.errors = undefined;
     return agent.Auth.register(this.values.name, this.values.username, this.values.email, this.values.password, this.values.phone)
       .then((user) => {
-      	console.log('U ', user);
-      	commonStore.setToken(user.token);
+      	routerStore.push('/');
+      	commonStore.setIam(user);
      	})
-      .then(() => routerStore.push('/'))
       .catch(action((err) => {
         this.errors = err.response && err.response.body && err.response.body.errors;
         throw err;
@@ -77,8 +75,8 @@ class AuthStore {
   }
 
   @action logout() {
-    commonStore.setToken(undefined);
-    userStore.forgetUser();
+    commonStore.setIam(undefined);
+    commonStore.forgetIam();
     routerStore.push('/');
   }
 }

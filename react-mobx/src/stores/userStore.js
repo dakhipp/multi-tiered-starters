@@ -24,7 +24,6 @@ class UserStore {
   @action forgetUser() {
     this.currentUser = undefined;
   }
-
 }
 
 export default new UserStore();

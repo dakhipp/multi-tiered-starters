@@ -19,8 +19,8 @@ const handleErrors = err => {
 const responseBody = res => res.body;
 
 const tokenPlugin = req => {
-  if (commonStore.token) {
-    req.set('authorization', `Token ${commonStore.token}`);
+  if (commonStore.iam) {
+    req.set('authorization', commonStore.iam.token);
   }
 };
 
@@ -52,16 +52,22 @@ const requests = {
 };
 
 const Auth = {
-  current: () =>
-    requests.get('/user'),
-  login: (email, password) =>
-    requests.post('/login', { email, password }),
+  login: (username, password) =>
+    requests.post('/login', { username, password }),
   register: (name, username, email, password, phone) =>
     requests.post('/register', { name, username, email, password, phone_number: phone }),
-  // save: user =>
-  //   requests.put('/user', { user })
+};
+
+const Test = {
+  open: () =>
+    requests.get('/roles/open'),
+  user: () =>
+    requests.get('/roles/user'),
+  admin: () =>
+    requests.get('/roles/admin'),
 };
 
 export default {
   Auth,
+  Test,
 };

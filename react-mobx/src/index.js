@@ -12,18 +12,24 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 
 import DefaultLayout from './layouts/DefaultLayout'
 import Home from './components/Home'
-import About from './components/About'
-// import Login from './components/Login'
+import AboutMe from './components/AboutMe'
+import Open from './components/Open'
+import User from './components/User'
+import Admin from './components/Admin'
+import Login from './components/Login'
 import Register from './components/Register'
 
 import routerStore, { history } from './stores/routerStore';
 import authStore from './stores/authStore';
+import commonStore from './stores/commonStore';
+import testStore from './stores/testStore';
 
 import './registerServiceWorker'
 import './css/index.css'
 
-
+promiseFinally.shim();
 injectTapEventPlugin()
+useStrict(true);
 
 const muiTheme = getMuiTheme({
   palette: {
@@ -40,12 +46,11 @@ const muiTheme = getMuiTheme({
 
 // can add other stores to share properties globaly using @inject and @observer
 const stores = {
-  routing: routerStore,
-  authStore
+  routerStore,
+  authStore,
+  commonStore,
+  testStore,
 };
-
-promiseFinally.shim();
-useStrict(true);
 
 ReactDOM.render(
   <Provider {...stores}>
@@ -53,8 +58,11 @@ ReactDOM.render(
 	    <Router history={history}>
 	      <DefaultLayout>
 	        <Route exact path="/" component={Home} />
-	        <Route path="/about" component={About} />
-	        { /* <Route path="/login" component={Login} /> */ }
+	        <Route path="/about" component={AboutMe} />
+	        <Route path="/open" component={Open} />
+	        <Route path="/user" component={User} />
+	        <Route path="/admin" component={Admin} />
+	        <Route path="/login" component={Login} />
 	        <Route path="/register" component={Register} />
 	      </DefaultLayout>
 	    </Router>

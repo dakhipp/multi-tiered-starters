@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Link } from 'react-router-dom'
+import { inject, observer } from 'mobx-react';
 
 import AppBar from 'material-ui/AppBar'
 import Drawer from 'material-ui/Drawer'
@@ -8,6 +9,7 @@ import MenuItem from 'material-ui/MenuItem'
 
 import CloseIcon from 'material-ui/svg-icons/content/clear';
 
+@inject('authStore', 'commonStore') @observer
 export default class DefaultLayout extends React.Component {
 	constructor(props) {
 		super(props)
@@ -17,6 +19,7 @@ export default class DefaultLayout extends React.Component {
 
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.closeDrawer = this.closeDrawer.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
   toggleDrawer() {
@@ -31,7 +34,41 @@ export default class DefaultLayout extends React.Component {
   	})
   }
 
+  handleLogout() {
+  	this.props.authStore.logout();
+  }
+
 	render() {
+		let loginLogout = null;
+		if(this.props.commonStore.iam) {
+			loginLogout = (
+				<MenuItem onClick={this.closeDrawer}>
+		    	<Link 
+		    		to="/"
+		    		onClick={this.handleLogout}
+		    		style={style.link}
+		    	>Logout</Link>
+		    </MenuItem>
+			)
+		} else {
+			loginLogout = (
+				<div>
+					<MenuItem onClick={this.closeDrawer}>
+		      	<Link 
+		      		to="/login"
+		      		style={style.link}
+		      	>Login</Link>
+		      </MenuItem>
+		      <MenuItem onClick={this.closeDrawer}>
+		      	<Link 
+		      		to="/register"
+		      		style={style.link}
+		      	>Register</Link>
+		      </MenuItem>
+		    </div>
+			)
+		}
+
 		return (
     	<div>
 	      <AppBar
@@ -52,26 +89,33 @@ export default class DefaultLayout extends React.Component {
 	        	<Link 
 	        		to="/"
 	        		style={style.link}
-	        	>Home</Link>
+	        	>Home (User Search)</Link>
 	        </MenuItem>
 	        <MenuItem onClick={this.closeDrawer}>
 	        	<Link 
 	        		to="/about"
 	        		style={style.link}
-	        	>About</Link>
+	        	>About Me</Link>
 	        </MenuItem>
 	        <MenuItem onClick={this.closeDrawer}>
 	        	<Link 
-	        		to="/login"
+	        		to="/open"
 	        		style={style.link}
-	        	>Login</Link>
+	        	>Scope Test Open</Link>
 	        </MenuItem>
 	        <MenuItem onClick={this.closeDrawer}>
 	        	<Link 
-	        		to="/register"
+	        		to="/user"
 	        		style={style.link}
-	        	>Register</Link>
+	        	>Scope Test User</Link>
 	        </MenuItem>
+	        <MenuItem onClick={this.closeDrawer}>
+	        	<Link 
+	        		to="/admin"
+	        		style={style.link}
+	        	>Scope Test Admin</Link>
+	        </MenuItem>
+	        { loginLogout }
 	      </Drawer>
 	      <div style={style.pageContainer}>
 		      {this.props.children}

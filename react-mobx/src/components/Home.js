@@ -13,8 +13,6 @@ const Home = () => (
 
 		<SearchBtn label="Search" primary={true} />
 
-		<p>{process.env.NODE_ENV}</p>
-
 		<Devtools />
 	</div>
 )
