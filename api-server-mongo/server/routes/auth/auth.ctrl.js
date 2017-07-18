@@ -22,6 +22,7 @@ handlers.register = function (request, reply) {
 		// check if user already exsists
 		return lib.getUserByUsername({ username: request.payload.username })
 		.then((user) => {
+			// https://dzone.com/articles/use-regex-test-password
 			if (request.payload.password !== request.payload.password_conf) {
 				throw Boom.badRequest('Password does not match password confirmation.');
 			}
