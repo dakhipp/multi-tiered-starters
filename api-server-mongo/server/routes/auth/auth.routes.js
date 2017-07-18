@@ -22,6 +22,10 @@ const routes = (server) => [{
 					.string()
 					.required()
 					.description('The password of the user.'),
+				password_conf: Joi
+					.string()
+					.required()
+					.description('The password confimation should match the password.'),
 				name: Joi
 					.string()
 					.required()

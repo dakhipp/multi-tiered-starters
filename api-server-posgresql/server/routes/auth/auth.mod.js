@@ -27,6 +27,11 @@ const joi = {
 			.required()
 			.description('The phone number of the user.')
 			.example('123-123-1234'),
+		scope: Joi
+			.string()
+			.required()
+			.description('The scope of a user\'s access rights.')
+			.example('USER'),
 		email: Joi
 			.string()
 			.required()

@@ -21,8 +21,14 @@ handlers.register = function (request, reply) {
 		// check if user already exsists
 		return lib.getUserByUsername({ username: request.payload.username })
 		.then((user) => {
+			if (request.payload.password !== request.payload.password_conf) {
+				throw Boom.badRequest('Password does not match password confirmation.');
+			}
+			if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/.test(request.payload.password)) {
+				throw Boom.badRequest('Password does not match minimum complexity requirements.');
+			}
 			if (user) {
-				throw Boom.badRequest('User already exsists.');
+				throw Boom.badRequest('User already exists.');
 			}
 			return lib.hashPassword(request.payload.password);
 		})

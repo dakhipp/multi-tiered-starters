@@ -10,7 +10,6 @@ const UserModel = require('../routes/users/user.mod').sql;
 // * remove right before sending to user
 const removeUnwanted = function (user) {
 	delete user.password;
-	delete user.scope;
 	delete user.createdAt;
 	delete user.updatedAt;
 	return user;

@@ -13,7 +13,6 @@ const db = Mongojs(Config.dbConnectStr, Config.dbCollections);
 // * remove right before sending to user
 const removeUnwanted = function (user) {
 	delete user.password;
-	delete user.scope;
 	return user;
 };
 
