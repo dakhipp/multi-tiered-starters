@@ -28,7 +28,7 @@ const TestRoutes = [{
 		tags: ['api', 'v1', 'roles'],
 		validate: {
 			headers: Joi.object({
-				'authorization': Joi.string().required(),
+				'authorization': Joi.string().required().description('The authorization token belonging to the current user.'),
 			}).options({ allowUnknown: true }),
 		},
 		auth: {
@@ -47,7 +47,7 @@ const TestRoutes = [{
 		tags: ['api', 'v1', 'roles'],
 		validate: {
 			headers: Joi.object({
-				'authorization': Joi.string().required(),
+				'authorization': Joi.string().required().description('The authorization token belonging to the current user.'),
 			}).options({ allowUnknown: true }),
 		},
 		auth: {

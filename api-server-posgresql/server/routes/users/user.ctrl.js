@@ -18,7 +18,7 @@ handlers.get = function (request, reply) {
 	if (request.params.id) {
 		return UserUtils.getUserById(request.params)
 		.then((user) => {
-			return reply(UserUtils.removeUnwanted(user));
+			return reply(lib.removeUnwanted(user));
 		})
 		.catch((err) => {
 			return reply(err);
@@ -29,7 +29,7 @@ handlers.get = function (request, reply) {
 
 handlers.post = function (request, reply) {
 	request.params = request.params || {};
-	if (request.params.id) {
+	if (request.auth.credentials.id === request.params.id) {
 		return reply(lib.postUser(request.params, request.payload));
 	}
 	return reply(Boom.badRequest());
@@ -57,12 +57,22 @@ lib.getUsers = function (query) {
 			],
 		})
 		.then((results) => {
-			return resolve(results.map((user) => UserUtils.removeUnwanted(user)));
+			return resolve(results.map((user) => lib.removeUnwanted(user)));
 		})
 		.catch((err) => {
 			return reject(Boom.wrap(err, 'Internal db error'));
 		});
 	});
+};
+
+// removes unwanted properties from user object, used before sending any users from db to client
+// * remove right before sending to client
+lib.removeUnwanted = function (user) {
+	delete user.password;
+	delete user.scope;
+	delete user.createdAt;
+	delete user.updatedAt;
+	return user;
 };
 
 lib.removeEmpty = function (obj) {
@@ -82,7 +92,7 @@ lib.postUser = function (params, payload) {
 			}
 		)
 		.then((user) => {
-			return resolve(UserUtils.removeUnwanted(user[1][0]));
+			return resolve(lib.removeUnwanted(user[1][0]));
 		})
 		.catch((err) => {
 			return reject(Boom.wrap(err, 'Internal db error'));

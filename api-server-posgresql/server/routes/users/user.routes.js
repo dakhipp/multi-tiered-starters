@@ -60,6 +60,9 @@ const routes = (server) => [{
 		description: 'Updates a user based on their ID.',
 		tags: ['api', 'v1', 'users'],
 		validate: {
+			headers: Joi.object({
+				'authorization': Joi.string().required().description('The authorization token belonging to the current user.')
+			}).options({ allowUnknown: true }),
 			params: {
 				id: Joi
 					.number()
@@ -84,7 +87,9 @@ const routes = (server) => [{
 		response: {
 			schema: Schema.user,
 		},
-		auth: false,
+		auth: {
+			scope: ['USER', 'ADMIN'],
+		},
 	}
 }];
 

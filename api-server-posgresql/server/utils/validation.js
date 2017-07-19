@@ -10,7 +10,7 @@ const JwtValidate = function (decoded, request, callback) {
 			return callback(null, false);
 		}
 		// do a role check, using the retured user's scope
-		return callback(null, true, { scope: userFromToken.scope });
+		return callback(null, true, { id: userFromToken.id, scope: userFromToken.scope });
 	})
 	.catch((err) => {
 		return reply(Boom.wrap(err));

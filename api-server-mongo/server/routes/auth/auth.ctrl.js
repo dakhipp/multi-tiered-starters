@@ -37,10 +37,11 @@ handlers.register = function (request, reply) {
 		.then((password) => {
 			const hashedUser = request.payload;
 			hashedUser.password = password;
+			delete hashedUser.password_conf;
 			return lib.createUser(lib.attachScope(hashedUser));
 		})
 		.then((createdUser) => {
-			return reply(lib.attachToken(UserUtils.removeUnwanted(createdUser)));
+			return reply(lib.attachToken(lib.removeUnwanted(createdUser)));
 		})
 		.catch((err) => {
 			return reply(Boom.wrap(err));
@@ -59,12 +60,19 @@ handlers.login = function (request, reply) {
 			return lib.comparePassword(request.payload.password, user);
 		})
 		.then((validatedUser) => {
-			return reply(lib.attachToken(UserUtils.removeUnwanted(validatedUser)));
+			return reply(lib.attachToken(lib.removeUnwanted(validatedUser)));
 		})
 		.catch((err) => {
 			return reply(Boom.wrap(err));
 		});
 	});
+};
+
+// removes unwanted properties from user object, used before sending any users from db to client
+// * remove right before sending to user
+lib.removeUnwanted = function (user) {
+	delete user.password;
+	return user;
 };
 
 // attaches default scope of USER to user object
