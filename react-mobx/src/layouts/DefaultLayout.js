@@ -89,7 +89,7 @@ export default class DefaultLayout extends React.Component {
 	        	<Link 
 	        		to="/"
 	        		style={style.link}
-	        	>Home (User Search)</Link>
+	        	>Home (User List)</Link>
 	        </MenuItem>
 	        <MenuItem onClick={this.closeDrawer}>
 	        	<Link 

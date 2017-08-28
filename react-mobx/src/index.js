@@ -23,6 +23,7 @@ import routerStore, { history } from './stores/routerStore';
 import authStore from './stores/authStore';
 import commonStore from './stores/commonStore';
 import testStore from './stores/testStore';
+import usersStore from './stores/usersStore';
 
 import './registerServiceWorker'
 import './css/index.css'
@@ -50,6 +51,7 @@ const stores = {
   authStore,
   commonStore,
   testStore,
+  usersStore,
 };
 
 ReactDOM.render(

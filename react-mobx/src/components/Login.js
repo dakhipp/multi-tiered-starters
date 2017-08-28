@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
-import { whyRun } from 'mobx';
 
 import TextField from 'material-ui/TextField';
 
@@ -34,12 +33,12 @@ export default class Login extends React.Component {
 
 
 	render() {
-		whyRun();
-    const { values, inProgress } = this.props.authStore;
+    const { values, inProgress, errors } = this.props.authStore;
 
 		return (
 			<div>
 				<h1>Login</h1>
+				<p>{errors}</p>
 				<Link to="/register">
           Don't have an account?
         </Link>

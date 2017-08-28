@@ -13,6 +13,7 @@ export default class Register extends React.Component {
 		this.handleUsernameChange = this.handleUsernameChange.bind(this);
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.handlePasswordChange = this.handlePasswordChange.bind(this);
+		this.handlePasswordConfChange = this.handlePasswordConfChange.bind(this);		
 		this.handlePhoneChange = this.handlePhoneChange.bind(this);
 		this.handleSubmitForm = this.handleSubmitForm.bind(this);
 	}
@@ -37,6 +38,10 @@ export default class Register extends React.Component {
 		this.props.authStore.setPassword(e.target.value);
   }
 
+  handlePasswordConfChange(e) {
+		this.props.authStore.setPasswordConf(e.target.value);
+  }
+
   handlePhoneChange(e) {
 		this.props.authStore.setPhone(e.target.value);
 	}
@@ -47,11 +52,12 @@ export default class Register extends React.Component {
   };
 
 	render() {
-    const { values, inProgress } = this.props.authStore;
+    const { values, inProgress, errors } = this.props.authStore;
 
 		return (
 			<div>
 				<h1>Register</h1>
+				<p>{errors}</p>
 				<Link to="/login">
           Have an account?
         </Link>
@@ -84,6 +90,12 @@ export default class Register extends React.Component {
 			      hintText="Password"
 			      value={values.password}
             onChange={this.handlePasswordChange}
+			    />
+			    <br />
+			    <TextField
+			      hintText="Password Confirmation"
+			      value={values.password_conf}
+            onChange={this.handlePasswordConfChange}
 			    />
 			    <br />
 			    <button 

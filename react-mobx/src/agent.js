@@ -5,7 +5,9 @@ import authStore from './stores/authStore';
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
-const API_ROOT = 'http://localhost:8000/v1';
+// const API_ROOT = 'http://localhost:8000/v1';
+const API_ROOT = 'http://mongo-api.dakotahipp.com/v1';
+// const API_ROOT = 'http://psql-api.dakotahipp.com/v1';
 
 // const encode = encodeURIComponent;
 
@@ -54,8 +56,8 @@ const requests = {
 const Auth = {
   login: (username, password) =>
     requests.post('/login', { username, password }),
-  register: (name, username, email, password, phone) =>
-    requests.post('/register', { name, username, email, password, phone_number: phone }),
+  register: (name, username, email, password, password_conf, phone) =>
+    requests.post('/register', { name, username, email, password, password_conf, phone_number: phone }),
 };
 
 const Test = {
@@ -67,7 +69,13 @@ const Test = {
     requests.get('/roles/admin'),
 };
 
+const Users = {
+  getAll: () =>
+    requests.get('/users'),
+};
+
 export default {
   Auth,
   Test,
+  Users,
 };

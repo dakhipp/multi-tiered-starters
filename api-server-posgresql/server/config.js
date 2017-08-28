@@ -1,7 +1,7 @@
 'use strict';
 
 // load .env environment variables
-require('dotenv').config('../.env');
+require('dotenv').config({ path: '../.env' });
 
 const host = process.env.HOST;
 const port = process.env.PORT;

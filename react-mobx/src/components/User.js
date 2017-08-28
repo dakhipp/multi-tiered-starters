@@ -1,10 +1,7 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 
-import Devtools from 'mobx-react-devtools';
-
-@inject('testStore') 
-@observer
+@inject('testStore') @observer
 export default class User extends React.Component {
 	componentDidMount() {
 		this.props.testStore.user();
@@ -20,8 +17,6 @@ export default class User extends React.Component {
 			<div>
 				<h1 style={{color:'blue'}}>User</h1>
 				<p>{result}</p>
-
-				<Devtools />
 			</div>
 		)
 	}

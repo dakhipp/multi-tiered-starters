@@ -13,6 +13,7 @@ class AuthStore {
     username: '',
     email: '',
     password: '',
+    password_conf: '',
     phone: '',
   };
 
@@ -32,6 +33,10 @@ class AuthStore {
     this.values.password = password;
   }
 
+  @action setPasswordConf(password) {
+    this.values.password_conf = password;
+  }
+
   @action setPhone(phone) {
     this.values.phone = phone;
   }
@@ -41,6 +46,7 @@ class AuthStore {
     this.values.username = '';
     this.values.email = '';
     this.values.password = '';
+    this.values.password_conf = '';
     this.values.phone = '';
   }
 
@@ -53,7 +59,7 @@ class AuthStore {
       	commonStore.setIam(user);
       })
       .catch(action((err) => {
-        this.errors = err.response && err.response.body && err.response.body.errors;
+        this.errors = err.response.body.message;
         throw err;
       }))
       .finally(action(() => { this.inProgress = false; }));
@@ -62,13 +68,14 @@ class AuthStore {
   @action register() {
     this.inProgress = true;
     this.errors = undefined;
-    return agent.Auth.register(this.values.name, this.values.username, this.values.email, this.values.password, this.values.phone)
+    return agent.Auth.register(this.values.name, this.values.username, this.values.email, this.values.password, this.values.password_conf, this.values.phone)
       .then((user) => {
       	routerStore.push('/');
       	commonStore.setIam(user);
      	})
       .catch(action((err) => {
-        this.errors = err.response && err.response.body && err.response.body.errors;
+      	console.log(err.response.body.message);
+        this.errors = err.response.body.message;
         throw err;
       }))
       .finally(action(() => { this.inProgress = false; }));

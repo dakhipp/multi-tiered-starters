@@ -1,17 +1,38 @@
 import React from 'react'
-import { observer } from 'mobx-react'
+import { inject, observer } from 'mobx-react'
 
-@observer
+@inject('usersStore') @observer
 export default class UsersList extends React.Component {
-	render() {
-		const userItem = this.props.users.map((user, i) => {
+	constructor(props) {
+		super(props);
+		
+		this.renderList = this.renderList.bind(this);
+	}
+
+	componentWillMount() {
+		this.props.usersStore.getAll();	
+	}
+
+	renderList() {
+		const { users } = this.props.usersStore;
+
+		return users.map((user, i) => {
 			return (
 				<div key={i}>
-					<p>{user.name}</p>
-					<p>{user.age}</p>
+					<p>Username: {user.username}</p>
 				</div>
 			);
 		});
-		return <div>{userItem}</div>
+	}
+
+	render() {
+		const { users } = this.props.usersStore;
+
+		return (
+			<div>
+				<h2>User List:</h2>
+				{ users.length ? this.renderList() : "Loading..." }
+			</div>
+		);
 	}
 }
